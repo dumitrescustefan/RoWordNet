@@ -1,6 +1,7 @@
 import wordnet
 from synset import Synset
 import networkx as nx
+from similarity import Similarity
 
 
 def from_xml(filename):
@@ -46,7 +47,7 @@ def difference (wordnet_object_1, wordnet_object_2):
     return None
 
 
-def demo_create_and_edit_synsets():
+def demo_operations_with_synsets():
     print("\n\nThis demo shows how to create and edit synsets.\n"+"_"*70)
 
     # create a synset( it's recommended to use the function 'generate_synset_id'
@@ -141,7 +142,7 @@ def demo_load_and_save_wordnet():
     wn.load("resources/binary_wn.pck", xml=False)
 
 
-def demo_basic_wordnet_operations():
+def demo_operations_with_wordnet():
     print("\n\nThis demo shows how to work with synsets.\n"+"_"*70)
     # load from binary wordnet
     wn = wordnet.WordNet("resources/binary_wn.pck", xml=False)
@@ -288,11 +289,16 @@ def demo_operations_with_two_wordnets():
     pass
 
 
+def demo_operations_with_similarity():
+    pass
+
+
 if __name__ == '__main__':
-    demo_create_and_edit_synsets()
+    demo_operations_with_synsets()
     demo_load_and_save_wordnet()
-    demo_basic_wordnet_operations()
-    # demo_operations_with_two_wordnets()
+    demo_operations_with_wordnet()
+    demo_operations_with_two_wordnets()
+    demo_operations_with_similarity()
 
     
 
