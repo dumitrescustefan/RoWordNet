@@ -1,6 +1,5 @@
 import wordnet
 from synset import Synset
-import networkx as nx
 
 
 def intersection(wordnet_object_1, wordnet_object_2):
@@ -137,7 +136,7 @@ def demo_load_and_save_wordnet():
 def demo_basic_wordnet_operations():
     print("\n\nThis demo shows how to work with synsets.\n"+"_"*70)
     # load from binary wordnet
-    wn = wordnet.WordNet("resources/binary_wn.pck", xml=False)
+    wn = wordnet.WordNet()
     
     # get all synsets
     synsets = wn.synsets()
@@ -160,7 +159,6 @@ def demo_basic_wordnet_operations():
     synsets_adverbs = wn.synsets(pos=Synset.Pos.ADVERB)
     print("\tTotal number of adverb synsets: {}"
           .format(len(synsets_adverbs)))
-
 
     # search for a word in all synsets.
     # Returns an empty list if none is found.
@@ -199,22 +197,27 @@ def demo_basic_wordnet_operations():
 
     # create a synset with previous id
     synset = Synset(id)
+    synset.save_changes()
     print("\n\tSynset with id '{}' has been created".format(synset.id))
     # add the synset to the wordnet
-    wn.add_synset(synset)
     print("\n\tAdded synset with id '{}' to the wordnet".format(synset.id))
 
     # add a literal to synset
     word = 'iepure'
-    sense = 'animal care fuge'
-    wn.add_literal(synset_id=synset.id, word=word, sense=sense)
+    sense = '1'
+    synset = wn.synsets()[0]
+    synset.add_literal(word, sense)
+    synset.save_changes()
     print("\n\tAdded literal with word '{}' and sense '{}' to "
           "the synset with id '{}'. Number of literals: {}"
           .format(word, sense, synset.id, len(synset.literals)))
 
     # remove the previous literal from synset. If no id for syset
     # is given then it will remove this literal from all synsets
-    wn.remove_literal(word=word, synset_id=synset.id)
+    word = "iepure"
+    synset = wn.synsets()[0]
+    synset.remove_literal(word)
+    synset.save_changes()
     print("\tRemoved literal with word '{}' from the synset with id '{}'. "
           "Number of literals: {}"
           .format(word, synset.id, len(synset.literals)))
@@ -280,6 +283,7 @@ def demo_basic_wordnet_operations():
           .format(synset1.id, synset2.id))
     print("\t{}".format(x))
 
+
 def demo_get_synonymy_antonymy():
     import itertools
 
@@ -288,10 +292,13 @@ def demo_get_synonymy_antonymy():
     # load from binary wordnet
     wn = wordnet.WordNet()
 
-    print("\n\tTask: We would like to extract a list of synonyms and antonyms from all the nouns in WordNet.")
+    print("\n\tTask: We would like to extract a list of synonyms and "
+          "antonyms from all the nouns in WordNet.")
 
     # get synonymy relations
-    print("\n\tWe first extract synonyms directly from synsets. We list all noun synsets then iterate \n\tthrough them and create pairs from each synset.")
+    print("\n\tWe first extract synonyms directly from synsets. "
+          "We list all noun synsets then iterate \n\tthrough them and "
+          "create pairs from each synset.")
 
     synonyms = []
     synsets = wn.synsets()
@@ -341,7 +348,7 @@ if __name__ == '__main__':
     demo_create_and_edit_synsets()
     demo_load_and_save_wordnet()
     demo_basic_wordnet_operations()
-    demo_get_synonymy_antonymy()
+    #demo_get_synonymy_antonymy()
 
     # demo_operations_with_two_wordnets()
 

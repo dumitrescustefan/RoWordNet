@@ -72,6 +72,7 @@ class Synset(object):
         self._sumotype = sumotype
         self._sentiwn = sentiwn
         self._nonlexicalized = nonlexicalized
+        self._wordnets = set()
 
     @property
     def id(self):
@@ -259,7 +260,6 @@ class Synset(object):
 
     @nonlexicalized.setter
     def nonlexicalized(self, value: str):
-        #TODO: check if is the correct type
         self._nonlexicalized = value
 
     @property
@@ -280,6 +280,13 @@ class Synset(object):
                             .format(type(value).__name__))
 
         self._stamp = value
+
+    def add_wordnet(self, wordnet):
+        self._wordnets.add(wordnet)
+
+    def save_changes(self):
+        for wordnet in self._wordnets:
+            wordnet.update_synset(self)
 
     def add_literal(self, word, sense):
         """

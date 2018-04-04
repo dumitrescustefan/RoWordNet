@@ -1,7 +1,6 @@
 from nltk.tokenize import sent_tokenize
 import nltk
 import string
-from wordnet import WordNet
 
 
 def split_sentences(sentences):

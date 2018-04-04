@@ -43,7 +43,7 @@ class WordNet(object):
             return
 
         if filename is None:
-            self._load_from_xml("resources/RoWn.xml")
+            self._load_from_binary("resources/binary_wn.pck")
             return
 
         if xml is True:
@@ -183,6 +183,7 @@ class WordNet(object):
                     synset.sentiwn = [float(subelement.text)
                                       for subelement in element]
 
+            synset.add_wordnet(self)
             self._synsets[synset.id] = synset
 
     def _load_from_binary(self, filename):
@@ -465,90 +466,19 @@ class WordNet(object):
 
         self._graph.add_node(synset.id)
         self._synsets[synset.id] = synset
+        synset.add_wordnet(self)
         for literal in synset.literals:
             self._literal2synset[literal].append(synset.id)
 
-    def add_literal(self, word, sense, synset_id):
-        """
-            Add a literal to a synset.
-
-            Args:
-                synset_id (str): The id of the synset.
-                word (str): The word of the literal.
-                sense (str): The sense of the literal.
-
-            Raises:
-                TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given id in the
-                    wordnet.
-        """
-
-        if not isinstance(word, str):
-            raise TypeError("Argument 'word' has incorrect type, "
-                            "expected str, got {}"
-                            .format(type(word).__name__))
-        if not isinstance(sense, str):
-            raise TypeError("Argument 'sense' has incorrect type, "
-                            "expected str, got {}"
-                            .format(type(sense).__name__))
-        if not isinstance(synset_id, str):
-            raise TypeError("Argument 'synset_id' has incorrect type, "
-                            "expected str, got {}"
-                            .format(type(synset_id).__name__))
-        if synset_id not in self._synsets:
+    def update_synset(self, synset):
+        if synset.id not in self._synsets:
             raise WordNetError("Synset with id '{}' is not in the wordnet"
-                               .format(synset_id))
-
-        synset = self._synsets[synset_id]
-        synset.add_literal(word, sense)
-        self._literal2synset[word].append(synset_id)
-
-    def remove_literal(self, word, synset_id=None):
-        """
-            Remove a literal from from wordnet. If 'synset_id' is not None, the
-            literal will be removed only from the synset with this id.
-
-            Args:
-                word (str): The word of the literal.
-                synset_id (str, optional): Id of the synset. Defaults to None.
-
-            Raises:
-                TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given id in the
-                    wordnet or if no synset has a literal with the given
-                    word.
-        """
-
-        if not isinstance(word, str):
-            raise TypeError("Argument 'word' has incorrect type, "
-                            "expected str, got {}"
-                            .format(type(word).__name__))
-
-        if synset_id is not None:
-            if not isinstance(synset_id, str):
-                raise TypeError("Argument 'synset_id' has incorrect type, "
-                                "expected str, got {}"
-                                .format(type(synset_id).__name__))
-            if synset_id not in self._synsets:
-                raise WordNetError("Synset with id '{}' is not in the wordnet"
-                                   .format(synset_id))
-
-            synset = self._synsets[synset_id]
-
-            synset.remove_literal(word)
-            self._literal2synset[word].remove(synset_id)
+                               .format(synset.id))
         else:
-            if word not in self._literal2synset:
-                raise WordNetError("There's no literal with the word '{}' in "
-                                   "the wordnet".format(word))
+            self._synsets[synset.id] = synset
 
-            synsets_id = self._literal2synset[word]
-            self._literal2synset.pop(word)
-
-            for synset_id in synsets_id:
-                synset = self._synsets[synset_id]
-
-                synset.remove_literal(word)
+            for word in synset.literals:
+                self._literal2synset[word].append(synset.id)
 
     def add_relation(self, synset_id1, synset_id2, relation):
         """
@@ -741,21 +671,29 @@ class WordNet(object):
             raise WordNetError("Synset with id '{}' is not in the wordnet"
                                .format(synset_id))
 
-        queue = Queue() # get a queue to put syns in
-        queue.put(synset_id) # add the first syn
-        marked_synsets_id = [synset_id] # list where marked syns are in. Used to not repetead syns
+        queue = Queue()
+        queue.put(synset_id)
+        marked_synsets_id = [synset_id]
+        from_synsets_rel = dict()
+        from_synsets_rel[synset_id] = (None, None)
 
-        while not queue.empty(): # while i have elements
-            cur_synset_id = queue.get() # get the next element
+        while not queue.empty():
+            cur_synset_id = queue.get()
 
-            adj_synsets_id = self._graph[cur_synset_id] # get its adj syns
+            adj_synsets_id = self._graph.adj[cur_synset_id]
 
-            for adj_synset_id in adj_synsets_id: # for every adj syn
-                if adj_synset_id not in marked_synsets_id: # if it's not colored. Can do O(1) here if use memory?
-                    marked_synsets_id.append(adj_synset_id) # mark the syn
-                    queue.put(adj_synset_id) # add the syn to queue
+            for adj_synset_id, data in adj_synsets_id.items():
+                if adj_synset_id not in marked_synsets_id:
+                    marked_synsets_id.append(adj_synset_id)
+                    queue.put(adj_synset_id)
+                    from_synsets_rel[adj_synset_id] = (data['label'],
+                                                       self._synsets[cur_synset_id])
 
-            yield self._synsets[cur_synset_id]
+            yield self._synsets[cur_synset_id], \
+                from_synsets_rel[cur_synset_id][0], \
+                from_synsets_rel[cur_synset_id][1]
+
+            from_synsets_rel.pop(cur_synset_id)
 
     def shortest_path(self, synset_id1, synset_id2):
         """
