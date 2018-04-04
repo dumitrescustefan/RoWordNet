@@ -7,7 +7,7 @@ def split_sentences(sentences):
     return sent_tokenize(sentences)
 
 
-def get_word_tokens(sentence):
+def word_tokens(sentence):
     return nltk.word_tokenize(sentence)
 
 
@@ -59,7 +59,7 @@ def get_poses(tokens, wordnet):
     return poses
 
 
-def get_poses_lemmas(tokens, wordnet):
+def poses_and_lemmas(tokens, wordnet):
     tokens = strip_punctuation(tokens)
     tokens = strip_stopwords(tokens)
 
@@ -80,9 +80,9 @@ def parse_corpus(filename, wordnet):
     lemmas_list = []
 
     for sentence in sentences:
-        tokens = get_word_tokens(sentence)
+        tokens = word_tokens(sentence)
 
-        poses, lemmas = get_poses_lemmas(tokens, wordnet)
+        poses, lemmas = poses_and_lemmas(tokens, wordnet)
         poses_list.append(poses)
         lemmas_list.append(lemmas)
 

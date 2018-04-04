@@ -259,8 +259,10 @@ class Synset(object):
 
     @nonlexicalized.setter
     def nonlexicalized(self, value: str):
-        #TODO: check if is the correct type
-        self._nonlexicalized = value
+        if not isinstance(value, str) and value is not None:
+            raise TypeError("Argument 'value' has incorrect type, "
+                            "expected str, got {}"
+                            .format(type(value).__name__))
 
     @property
     def stamp(self):

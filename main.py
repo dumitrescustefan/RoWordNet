@@ -1,4 +1,4 @@
-import wordnet
+from wordnet import WordNet
 from synset import Synset
 import networkx as nx
 from similarity import Similarity
@@ -48,7 +48,7 @@ def difference (wordnet_object_1, wordnet_object_2):
 
 
 def demo_operations_with_synsets():
-    print("\n\nThis demo shows how to create and edit synsets.\n"+"_"*70)
+    print("\n\nThis demo shows how to work with synsets.\n"+"_"*70)
 
     # create a synset( it's recommended to use the function 'generate_synset_id'
     # from the wordnet class. See the function "demo_basic_wordnet_operations'
@@ -122,8 +122,8 @@ def demo_operations_with_synsets():
 def demo_load_and_save_wordnet():
     print("\n\nThis demo shows how to initialize, "
           "save and load a wordnet object.\n" + "_"*70)
-    # load internal wordnet
-    wn = wordnet.WordNet()
+    # load wordnet from binary file
+    wn = WordNet("resources/binary_wn.pck", xml=False)
     
     # save wordnet to xml
     print("\n\t Saving the wordnet in xml file")
@@ -143,9 +143,10 @@ def demo_load_and_save_wordnet():
 
 
 def demo_operations_with_wordnet():
-    print("\n\nThis demo shows how to work with synsets.\n"+"_"*70)
+    print("\n\nThis demo shows how to work with a wordnet.\n"+"_"*70)
     # load from binary wordnet
-    wn = wordnet.WordNet("resources/binary_wn.pck", xml=False)
+    wn = WordNet("resources/binary_wn.pck", xml=False)
+    print("\n\tA wordnet object has been created")
     
     # get all synsets
     synsets = wn.synsets()
@@ -290,14 +291,54 @@ def demo_operations_with_two_wordnets():
 
 
 def demo_operations_with_similarity():
-    pass
+    print("\n\nThis demo shows how to work with a similarity.\n" + "_" * 70)
+    # create a wordnet
+    wn = WordNet()
 
+    # create a similarity object
+    corpus_path = "resources/corpus.txt"
+    sim = Similarity(wn, corpus_path)
+    print("\n\tA Similarity object has been created")
+
+    # compute a Lesk algorithm
+    sim.lesk()
+    print("\n\tInformation content has been calculated using Les algorithm")
+
+    # get information content of a synset
+    synset = wn.synsets("lup")[0]
+    ic = sim.information_content(synset.id)
+    print("\n\tSynset with id '{}' has '{} information content"
+          .format(synset.id, ic))
+
+    # get reskin similarity for hypernym tree
+    synset1 = wn.synsets("lup")[0]
+    synset2 = wn.synsets("cal")[0]
+    relation = "hypernym"
+    s = sim.resnik(synset1.id, synset2.id,  relation=relation)
+    print("\n\tSimilarity between synset with id '{}' and synset with id '{}"
+          "using resnik algorithm is: {}".format(synset1.id, synset2.id, s))
+
+    # get lin similarity for hypernym tree
+    s = sim.lin(synset1.id, synset2.id, relation=relation)
+    print("\tSimilarity between synset with id '{}' and synset with id '{}"
+          "using lin algorithm is: {}".format(synset1.id, synset2.id, s))
+
+    # get jcn similarity for hypernym tree
+    s = sim.resnik(synset1.id, synset2.id, relation=relation)
+    print("\tSimilarity between synset with id '{}' and synset with id '{}"
+          "using jcn algorithm is: {}".format(synset1.id, synset2.id, s))
+
+    # get jcn_distance similarity for hypernym tree
+    s = sim.resnik(synset1.id, synset2.id, relation=relation)
+    print("\tSimilarity between synset with id '{}' and synset with id '{}"
+          "using jcn_distance algorithm is: {}"
+          .format(synset1.id, synset2.id, s))
 
 if __name__ == '__main__':
-    demo_operations_with_synsets()
-    demo_load_and_save_wordnet()
-    demo_operations_with_wordnet()
-    demo_operations_with_two_wordnets()
+    #demo_operations_with_synsets()
+    #demo_load_and_save_wordnet()
+    #demo_operations_with_wordnet()
+    #demo_operations_with_two_wordnets()
     demo_operations_with_similarity()
 
     

@@ -36,7 +36,7 @@ class Similarity(object):
         self._information_content = {synset.id: 0 for synset in synsets}
 
     def _overlap_context(self, synset, sentence):
-        gloss = get_word_tokens(synset.definition) # tokenizez definitie
+        gloss = word_tokens(synset.definition) # tokenizez definitie
         gloss = strip_stopwords(gloss) # sterg stop word-urile
         gloss = strip_punctuation(gloss) # sterg semnele de punctuatie
 
@@ -57,6 +57,9 @@ class Similarity(object):
                 best_sense = synset
 
         return best_sense
+
+    def information_content(self, synset_id):
+        return self._information_content[synset_id]
 
     # in engleza se calculeaza overlapul si pentru hyponyms
     def lesk(self):
