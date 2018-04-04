@@ -1,6 +1,5 @@
 import wordnet
 from synset import Synset
-from random import randint
 import networkx as nx
 
 

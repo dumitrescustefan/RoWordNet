@@ -1,5 +1,5 @@
 from wordnet import WordNet
-from utils import *
+from preprocessing.corpus import *
 
 
 class Similarity(object):
