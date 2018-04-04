@@ -304,7 +304,7 @@ class WordNet(object):
                     show_relations: bool=False):
         """
             Get the adjacent synsets of a synset with/without type of relations
-            between synsets. You can't retrevice the types of relations if you
+            between synsets. You can't retrieve the types of relations if you
             specify a type of relation
 
             Args:

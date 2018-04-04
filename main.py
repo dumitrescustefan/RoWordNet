@@ -1,32 +1,8 @@
-from wordnet import WordNet
+import wordnet
 from synset import Synset
 import networkx as nx
-from similarity import Similarity
 
 
-def from_xml(filename):
-    """Instantiate a WordNet object from an XML file"""
-    pass
-
-
-def to_xml(wordnet_object, filename):
-    """Write a WordNet object to an XML file"""
-    pass
-
-
-def from_binary(filename):
-    """Instantiate a WordNet object from binary file"""
-    wordnet_object = wordnet.WordNet()
-    wordnet_object.graph = nx.read_gpickle(filename)
-    return wordnet_object
-    
-    
-def to_binary(wordnet_object, filename):
-    """Write a WordNet object to a binary file"""
-    nx.write_gpickle(wordnet_object, filename)
-    
-
-#ce e mai jos facem mai tarziu
 def intersection(wordnet_object_1, wordnet_object_2):
     return None
 
@@ -47,8 +23,8 @@ def difference (wordnet_object_1, wordnet_object_2):
     return None
 
 
-def demo_operations_with_synsets():
-    print("\n\nThis demo shows how to work with synsets.\n"+"_"*70)
+def demo_create_and_edit_synsets():
+    print("\n\nThis demo shows how to create and edit synsets.\n"+"_"*70)
 
     # create a synset( it's recommended to use the function 'generate_synset_id'
     # from the wordnet class. See the function "demo_basic_wordnet_operations'
@@ -108,45 +84,60 @@ def demo_operations_with_synsets():
 
     # add more literals at once
     literals = {
-                    'leu': 'alt animal din savana',
-                    'lup': 'animal din padure',
-                    'vulpe': 'alt animal din padure'
+                    'leu': '1',
+                    'lup': '1.1',
+                    'vulpe': 'x'
                }
-    synset.literals = literals
-    print("\n\tLiterals literals has been aded to synset with id '{}'"
+
+    print("\n\tAdding literals to a synset. Initially we create them:")
+    print(literals)
+    print("\tDirect addition of {} literals to synset with id '{}'"
           .format(len(literals), synset.id))
+    synset.literals = literals
     print("\tNumber of literals for synset with id '{}': {}"
           .format(synset.id, len(synset.literals)))
 
 
 def demo_load_and_save_wordnet():
+    import time
+
     print("\n\nThis demo shows how to initialize, "
           "save and load a wordnet object.\n" + "_"*70)
-    # load wordnet from binary file
-    wn = WordNet("resources/binary_wn.pck", xml=False)
-    
+    # load internal wordnet
+    print("\n\t Loading from internal resources")
+    start = time.perf_counter()
+    wn = wordnet.WordNet()
+    print("\t\t... done in {:.3f}s".format(time.perf_counter() - start))
+
     # save wordnet to xml
     print("\n\t Saving the wordnet in xml file")
+    start = time.perf_counter()
     wn.save("resources/save_wn.xml")
+    print("\t\t... done in {:.3f}s".format(time.perf_counter()-start))
 
-    print("\n\t Load the wordnet from xml file")
     # load wordnet from xml
+    print("\n\t Load the wordnet from xml file")
+    start = time.perf_counter()
     wn.load("resources/save_wn.xml")
+    print("\t\t... done in {:.3f}s".format(time.perf_counter() - start))
 
-    print("\n\t Saving the wordnet in binary file")
     # save wordnet to binary
+    print("\n\t Saving the wordnet in binary file")
+    start = time.perf_counter()
     wn.save("resources/binary_wn.pck", xml=False)
+    print("\t\t... done in {:.3f}s".format(time.perf_counter() - start))
 
-    print("\n\t Load the wordnet from binary file")
     # load wordnet to binary
+    print("\n\t Load the wordnet from binary file")
+    start = time.perf_counter()
     wn.load("resources/binary_wn.pck", xml=False)
+    print("\t\t... done in {:.3f}s".format(time.perf_counter() - start))
 
 
-def demo_operations_with_wordnet():
-    print("\n\nThis demo shows how to work with a wordnet.\n"+"_"*70)
+def demo_basic_wordnet_operations():
+    print("\n\nThis demo shows how to work with synsets.\n"+"_"*70)
     # load from binary wordnet
-    wn = WordNet("resources/binary_wn.pck", xml=False)
-    print("\n\tA wordnet object has been created")
+    wn = wordnet.WordNet("resources/binary_wn.pck", xml=False)
     
     # get all synsets
     synsets = wn.synsets()
@@ -167,7 +158,7 @@ def demo_operations_with_wordnet():
           .format(len(synsets_adjectives)))
     # return all adverb synsets
     synsets_adverbs = wn.synsets(pos=Synset.Pos.ADVERB)
-    print("\tTotal number of adjective synsets: {}"
+    print("\tTotal number of adverb synsets: {}"
           .format(len(synsets_adverbs)))
 
 
@@ -269,11 +260,15 @@ def demo_operations_with_wordnet():
     new_synset = wn.synsets("cal")[2]
     # travel the graph with bfs algorithm
     counter = 0
-    print("\n\tTravelling through wordnet...")
-    for synset in wn.bfwalk(new_synset.id):
-        # do actions with synset
-        counter += 1
-    print("\n\tNumber of synsets that have been travelled through "
+    print("\n\tTravelling breadth-first through wordnet (first 10 synsets)...")
+    for current_synset, relation, from_synset in wn.bfwalk(new_synset.id):
+        # bfwalk is a generator that yields, for each call, a BF step through wordnet
+        # do actions with current_synset, relation, from_synset
+        if counter > 10:
+            break
+        else:
+            counter += 1
+    print("\tNumber of synsets that have been travelled through "
           "in wordnet: {}".format(counter))
 
     # get the lowest common ancestor in the hypernym tree
@@ -285,61 +280,70 @@ def demo_operations_with_wordnet():
           .format(synset1.id, synset2.id))
     print("\t{}".format(x))
 
+def demo_get_synonymy_antonymy():
+    import itertools
+
+    print("\n\nThis demo shows how a bit more advanced series of ops.\n" + "_" * 70)
+
+    # load from binary wordnet
+    wn = wordnet.WordNet()
+
+    print("\n\tTask: We would like to extract a list of synonyms and antonyms from all the nouns in WordNet.")
+
+    # get synonymy relations
+    print("\n\tWe first extract synonyms directly from synsets. We list all noun synsets then iterate \n\tthrough them and create pairs from each synset.")
+
+    synonyms = []
+    synsets = wn.synsets()
+    for synset in synsets: # for each synset, we create a list of synonyms between its literals
+        words = list(synset.literals.keys()) # the literals object is a dict, but we need only the actual words (not senses)
+        for i in range(len(words)):
+            for j in range(i+1,len(words)):
+                synonyms.append((words[i],words[j])) # append a tuple containing a pair of synonym words
+
+    # list a few synonyms
+    print("\n\tList of the first 10 synonyms:")
+    for i in range(10):
+        print("\t\t {} == {}".format(synonyms[i][0],synonyms[i][1]))
+
+    # now, antonyms
+    antonyms = []
+    print("\n\tWe now want to extract antonyms. We look at all the antonymy relations and then for each \n\tpair of synsets in this relation we generate a cartesian product between their literals.")
+
+    # extract all the antonymy relations from the graph and create a list of synset pairs
+    synset_pairs = []
+        # aici o populam cu tupluri de id-uri de synset-uri in antonimie
+
+    # for each synset pair extract its literals, so we now have a list of pairs of literals
+    literal_pairs = []
+    for synset_pair in synset_pairs:
+        # adaugam literalii. stiu ca duplicam munca si e inutil acest pas, dar e pentru demo sa se inteleaga ordinea logica
+        # practic in synset_pair[0] e id-ul primului synset, in [1] e al celui de-al doilea synset
+        # in literal_pairs trebuie sa avem o lista de tupluri unde fiecare tuplu contine o lista de literali (string-uri, cum am facut mai sus cu list(syn_x.literals.keys), nu dict)
+        pass
+
+    # for each literals pair, we generate the cartesian product between them
+    for literal_pair in literal_pairs:
+        for antonym_tuple in itertools.product(literal_pair[0], literal_pair[1]):
+            antonyms.append(antonym_tuple)
+
+    # list a few antonyms
+    print("\n\tList of the first 10 antonyms:")
+    for i in range(10):
+        print("\t\t {} == {}".format(antonyms[i][0], antonyms[i][1]))
+
 
 def demo_operations_with_two_wordnets():
     pass
 
 
-def demo_operations_with_similarity():
-    print("\n\nThis demo shows how to work with a similarity.\n" + "_" * 70)
-    # create a wordnet
-    wn = WordNet()
-
-    # create a similarity object
-    corpus_path = "resources/corpus.txt"
-    sim = Similarity(wn, corpus_path)
-    print("\n\tA Similarity object has been created")
-
-    # compute a Lesk algorithm
-    sim.lesk()
-    print("\n\tInformation content has been calculated using Les algorithm")
-
-    # get information content of a synset
-    synset = wn.synsets("lup")[0]
-    ic = sim.information_content(synset.id)
-    print("\n\tSynset with id '{}' has '{} information content"
-          .format(synset.id, ic))
-
-    # get reskin similarity for hypernym tree
-    synset1 = wn.synsets("lup")[0]
-    synset2 = wn.synsets("cal")[0]
-    relation = "hypernym"
-    s = sim.resnik(synset1.id, synset2.id,  relation=relation)
-    print("\n\tSimilarity between synset with id '{}' and synset with id '{}"
-          "using resnik algorithm is: {}".format(synset1.id, synset2.id, s))
-
-    # get lin similarity for hypernym tree
-    s = sim.lin(synset1.id, synset2.id, relation=relation)
-    print("\tSimilarity between synset with id '{}' and synset with id '{}"
-          "using lin algorithm is: {}".format(synset1.id, synset2.id, s))
-
-    # get jcn similarity for hypernym tree
-    s = sim.resnik(synset1.id, synset2.id, relation=relation)
-    print("\tSimilarity between synset with id '{}' and synset with id '{}"
-          "using jcn algorithm is: {}".format(synset1.id, synset2.id, s))
-
-    # get jcn_distance similarity for hypernym tree
-    s = sim.resnik(synset1.id, synset2.id, relation=relation)
-    print("\tSimilarity between synset with id '{}' and synset with id '{}"
-          "using jcn_distance algorithm is: {}"
-          .format(synset1.id, synset2.id, s))
-
 if __name__ == '__main__':
-    #demo_operations_with_synsets()
+    #demo_create_and_edit_synsets()
     #demo_load_and_save_wordnet()
-    #demo_operations_with_wordnet()
-    #demo_operations_with_two_wordnets()
-    demo_operations_with_similarity()
+    #demo_basic_wordnet_operations()
+    demo_get_synonymy_antonymy()
+
+    # demo_operations_with_two_wordnets()
 
     
 

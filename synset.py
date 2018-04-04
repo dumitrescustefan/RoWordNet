@@ -259,10 +259,8 @@ class Synset(object):
 
     @nonlexicalized.setter
     def nonlexicalized(self, value: str):
-        if not isinstance(value, str) and value is not None:
-            raise TypeError("Argument 'value' has incorrect type, "
-                            "expected str, got {}"
-                            .format(type(value).__name__))
+        #TODO: check if is the correct type
+        self._nonlexicalized = value
 
     @property
     def stamp(self):
@@ -316,7 +314,7 @@ class Synset(object):
 
     def __repr__(self):
         output = "Synset(id={!r}, pos={!r}, nonlexicalized={!r}, stamp={!r}, domain={!r}\n\t  definition={!r}" \
-                 "\n\t  Sumo={!r}, SumoType={!r}, sentiwn={!r}".\
+                 "\n\t  Sumo={!r}, SumoType={!r}, sentiwn={!r})".\
                  format(self._id, self._pos, self._nonlexicalized, self._stamp, self._domain, self._definition,
                         self._sumo, self._sumotype, self._sentiwn)
 
