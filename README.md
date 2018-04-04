@@ -1,0 +1,2 @@
+# RoWordNet
+Romanian WordNet
