@@ -197,7 +197,6 @@ def demo_basic_wordnet_operations():
 
     # create a synset with previous id
     synset = Synset(id)
-    synset.save_changes()
     print("\n\tSynset with id '{}' has been created".format(synset.id))
     # add the synset to the wordnet
     print("\n\tAdded synset with id '{}' to the wordnet".format(synset.id))
