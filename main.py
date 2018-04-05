@@ -264,8 +264,8 @@ def demo_basic_wordnet_operations():
     counter = 0
     print("\n\tTravelling breadth-first through wordnet (first 10 synsets)...")
     for current_synset, relation, from_synset in wn.bfwalk(new_synset.id):
-        # bfwalk is a generator that yields, for each call, a BF step through wordnet
-        # do actions with current_synset, relation, from_synset
+        # bfwalk is a generator that yields, for each call, a BF step through
+        # wordnet do actions with current_synset, relation, from_synset
         if counter > 10:
             break
         else:
@@ -286,7 +286,8 @@ def demo_basic_wordnet_operations():
 def demo_get_synonymy_antonymy():
     import itertools
 
-    print("\n\nThis demo shows how a bit more advanced series of ops.\n" + "_" * 70)
+    print("\n\nThis demo shows how a bit more advanced "
+          "series of ops.\n" + "_" * 70)
 
     # load from binary wordnet
     wn = wordnet.WordNet()
@@ -301,32 +302,51 @@ def demo_get_synonymy_antonymy():
 
     synonyms = []
     synsets = wn.synsets()
-    for synset in synsets: # for each synset, we create a list of synonyms between its literals
-        words = list(synset.literals.keys()) # the literals object is a dict, but we need only the actual words (not senses)
+    # for each synset, we create a list of synonyms between its literals
+    for synset in synsets:
+        # the literals object is a dict, but we need only the
+        # actual words (not senses)
+        words = list(synset.literals.keys())
         for i in range(len(words)):
             for j in range(i+1,len(words)):
-                synonyms.append((words[i],words[j])) # append a tuple containing a pair of synonym words
+                # append a tuple containing a pair of synonym words
+                synonyms.append((words[i], words[j]))
 
     # list a few synonyms
     print("\n\tList of the first 10 synonyms:")
     for i in range(10):
-        print("\t\t {} == {}".format(synonyms[i][0],synonyms[i][1]))
+        print("\t\t {} == {}".format(synonyms[i][0], synonyms[i][1]))
 
     # now, antonyms
     antonyms = []
-    print("\n\tWe now want to extract antonyms. We look at all the antonymy relations and then for each \n\tpair of synsets in this relation we generate a cartesian product between their literals.")
+    print("\n\tWe now want to extract antonyms. We look at all the antonymy r"
+          "elations and then for each \n\tpair of synsets in this relation "
+          "we generate a cartesian product between their literals.")
 
-    # extract all the antonymy relations from the graph and create a list of synset pairs
+    # extract all the antonymy relations from the graph and create a
+    # list of synset pairs
     synset_pairs = []
-        # aici o populam cu tupluri de id-uri de synset-uri in antonimie
 
-    # for each synset pair extract its literals, so we now have a list of pairs of literals
+    synsets = wn.synsets() # extract all synsets
+    for synset in synsets:
+        # extract the antonyms of a synset
+        synset_antonyms = wn.adj_synsets(synset.id, relation="near_antonym")
+        for synset_antonym in synset_antonyms: # for each antonym synset
+            # if the antonymy pair doesn't already exists
+            if (synset_antonym, synset) not in synset_pairs:
+                # add the antonym tuple to the list
+                synset_pairs.append((synset, synset_antonym))
+
+    # for each synset pair extract its literals, so we now have a list of
+    # pairs of literals
     literal_pairs = []
     for synset_pair in synset_pairs:
-        # adaugam literalii. stiu ca duplicam munca si e inutil acest pas, dar e pentru demo sa se inteleaga ordinea logica
-        # practic in synset_pair[0] e id-ul primului synset, in [1] e al celui de-al doilea synset
-        # in literal_pairs trebuie sa avem o lista de tupluri unde fiecare tuplu contine o lista de literali (string-uri, cum am facut mai sus cu list(syn_x.literals.keys), nu dict)
-        pass
+        # extract the literals of the first synset in the pair
+        synset1_literals = list(synset_pair[0].literals.keys())
+        # extract the literals of the second synset in the pair
+        synset2_literals = list(synset_pair[1].literals.keys())
+        # add a tuple containing the literals of each synset
+        literal_pairs.append((synset1_literals, synset2_literals))
 
     # for each literals pair, we generate the cartesian product between them
     for literal_pair in literal_pairs:
@@ -344,10 +364,10 @@ def demo_operations_with_two_wordnets():
 
 
 if __name__ == '__main__':
-    demo_create_and_edit_synsets()
-    demo_load_and_save_wordnet()
-    demo_basic_wordnet_operations()
-    #demo_get_synonymy_antonymy()
+    #demo_create_and_edit_synsets()
+    #demo_load_and_save_wordnet()
+    #demo_basic_wordnet_operations()
+    demo_get_synonymy_antonymy()
 
     # demo_operations_with_two_wordnets()
 
