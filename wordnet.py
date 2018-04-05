@@ -193,19 +193,21 @@ class WordNet(object):
 
         self._relations_type = wn.relations_type
 
-        synsets = wn.synsets()
+        synsets_id = wn.synsets()
 
-        for synset in synsets:
-            adj_synsets = wn.adjacent_synsets(synset.id, show_relations=True)
-            for adj_synset, relation in adj_synsets:
-                self._graph.add_edge(synset.id, adj_synset.id, label=relation)
+        for synset_id in synsets_id:
+            adj_synsets_id = wn.adjacent_synsets(synset_id,
+                                                 show_relations=True)
+            for adj_synset_id, relation in adj_synsets_id:
+                self._graph.add_edge(synset_id, adj_synset_id, label=relation)
 
-        for synset in synsets:
-            self._synsets[synset.id] = synset
+        for synset_id in synsets_id:
+            self._synsets[synset_id] = wn.synset(synset_id)
 
-        for synset in synsets:
+        for synset_id in synsets_id:
+            synset = wn.synset(synset_id)
             for word in synset.literals.keys():
-                self._literal2synset[word].append(synset.id)
+                self._literal2synset[word].append(synset_id)
 
     def _save_to_xml(self, filename):
         root = et.Element("ROWN")
@@ -277,7 +279,7 @@ class WordNet(object):
         """
 
         if word is None:
-            synsets = list(self._synsets.values())
+            synsets_id = list(self._synsets.keys())
         else:
             if not isinstance(word, str):
                 raise TypeError("Argument 'word' has incorrect type, "
@@ -289,20 +291,19 @@ class WordNet(object):
 
             synsets_id = self._literal2synset[word]
 
-            synsets = [self._synsets[synset_id] for synset_id in synsets_id]
-
         if pos is not None:
             if not isinstance(pos, Synset.Pos):
                 raise TypeError("Argument 'pos' has incorrect type, "
                                 "expected Synset.Pos, got {}"
                                 .format(type(pos).__name__))
 
-            synsets = [synset for synset in synsets if synset.pos == pos]
+            synsets_id = [synset_id for synset_id in synsets_id
+                          if self._synsets[synset_id].pos == pos]
 
-        return synsets
+        return synsets_id
 
     def adjacent_synsets(self, synset_id: str, relation: str=None,
-                    show_relations: bool=False):
+                         show_relations: bool=False):
         """
             Get the adjacent synsets of a synset with/without type of relations
             between synsets. You can't retrieve the types of relations if you
@@ -335,13 +336,13 @@ class WordNet(object):
             raise ValueError("Arguments 'relation' and 'show_relations'"
                              "can't be both valid")
 
-        adj_synsets = []
+        adj_synsets_id = []
 
         try:
             if show_relations is False:
                 if relation is None:
-                    adj_synsets = [self._synsets[adj_synset_id]
-                                   for adj_synset_id in self._graph[synset_id]]
+                    adj_synsets_id = [adj_synset_id for adj_synset_id
+                                      in self._graph[synset_id]]
                 else:
                     if not isinstance(relation, str):
                         raise TypeError(
@@ -353,7 +354,7 @@ class WordNet(object):
                                            "relation".format(relation))
                     for adj_synset_id, data in self._graph.adj[synset_id].items():
                         if data['label'] == relation:
-                            adj_synsets.append(self._synsets[adj_synset_id])
+                            adj_synsets_id.append(adj_synset_id)
             else:
                 if not isinstance(show_relations, bool):
                     raise TypeError("Argument 'show_relations' has incorrect "
@@ -361,12 +362,12 @@ class WordNet(object):
                                     .format(type(show_relations).__name__))
 
                 for adj_synset_id, data in self._graph.adj[synset_id].items():
-                    adj_synsets.append((self._synsets[adj_synset_id],
-                                        data['label']))
+                    adj_synsets_id.append((adj_synset_id,
+                                           data['label']))
         except KeyError:
             return []
 
-        return adj_synsets
+        return adj_synsets_id
 
     def synset(self, synset_id: str):
         """
@@ -644,7 +645,7 @@ class WordNet(object):
             for synset_2 in synset_id2_to_root:
                 if synset_1 == synset_2:
                     lowest_common_ancestor = synset_1
-                    return self._synsets[lowest_common_ancestor]
+                    return lowest_common_ancestor
 
     def bfwalk(self, synset_id):
         """
@@ -735,8 +736,6 @@ class WordNet(object):
 
     def similarity(self, word1: str, word2: str):
         pass
-
-
 
 
 def intersection(wordnet_object_1, wordnet_object_2):

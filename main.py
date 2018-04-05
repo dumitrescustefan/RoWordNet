@@ -118,50 +118,50 @@ def demo_basic_wordnet_operations():
     wn = wordnet.WordNet()
     
     # get all synsets
-    synsets = wn.synsets()
-    print("\n\tTotal number of synsets: {} \n".format(len(synsets)))
+    synsets_id = wn.synsets()
+    print("\n\tTotal number of synsets: {} \n".format(len(synsets_id)))
     # example of iterating through synsets
-    for synset in wn.synsets():
+    for synset_id in synsets_id:
         pass
 
     # return all noun synsets
-    synsets_nouns = wn.synsets(pos=Synset.Pos.NOUN)
-    print("\tTotal number of noun synsets: {}".format(len(synsets_nouns)))
+    synsets_id_nouns = wn.synsets(pos=Synset.Pos.NOUN)
+    print("\tTotal number of noun synsets: {}".format(len(synsets_id_nouns)))
     # return all verb synsets
-    synsets_verbs = wn.synsets(pos=Synset.Pos.VERB)
-    print("\tTotal number of verb synsets: {}".format(len(synsets_verbs)))
+    synsets_id_verbs = wn.synsets(pos=Synset.Pos.VERB)
+    print("\tTotal number of verb synsets: {}".format(len(synsets_id_verbs)))
     # return all adjective synsets
-    synsets_adjectives = wn.synsets(pos=Synset.Pos.ADJECTIVE)
+    synsets_id_adjectives = wn.synsets(pos=Synset.Pos.ADJECTIVE)
     print("\tTotal number of adjective synsets: {}"
-          .format(len(synsets_adjectives)))
+          .format(len(synsets_id_adjectives)))
     # return all adverb synsets
-    synsets_adverbs = wn.synsets(pos=Synset.Pos.ADVERB)
+    synsets_id_adverbs = wn.synsets(pos=Synset.Pos.ADVERB)
     print("\tTotal number of adverb synsets: {}"
-          .format(len(synsets_adverbs)))
+          .format(len(synsets_id_adverbs)))
 
     # search for a word in all synsets.
     # Returns an empty list if none is found.
     search_word = 'arbore'
-    synset = wn.synsets(word=search_word)
+    synsets_id = wn.synsets(word=search_word)
     print("\n\tTotal number of synsets containing word '{}': {}\n"
-          .format(search_word, len(synset)))
+          .format(search_word, len(synsets_id)))
 
     # search for a word in all noun synsets
     search_word = 'cal'
-    synset= wn.synsets(word=search_word, pos=Synset.Pos.NOUN)
+    synsets_id = wn.synsets(word=search_word, pos=Synset.Pos.NOUN)
     print("\tTotal number of noun synsets containing word '{}': {}"
-          .format(search_word, len(synset)))
+          .format(search_word, len(synsets_id)))
 
     # get the adjacent synsets of a synset.
-    synset = wn.synsets(word='cal')[2]
-    adj_synsets = wn.adjacent_synsets(synset.id)
+    synset_id = wn.synsets(word='cal')[2]
+    adj_synsets_id = wn.adjacent_synsets(synset_id)
     print("\n\tSynset with id '{}' has {} adjacent synsets"
-          .format(synset.id, len(adj_synsets)))
+          .format(synset_id, len(adj_synsets_id)))
     # get all adjacent synsets with a specific relation of this synset.
     relation = "hyponym"
-    adj_synsets = wn.adjacent_synsets(synset.id, relation=relation)
+    adj_synsets_id = wn.adjacent_synsets(synset_id, relation=relation)
     print("\tSynset with id '{}' has {} {} relations"
-          .format(synset.id, len(adj_synsets), relation))
+          .format(synset_id, len(adj_synsets_id), relation))
 
     # generate a new id with default prefix and suffix
     id = wn.generate_synset_id()
@@ -178,27 +178,28 @@ def demo_basic_wordnet_operations():
     synset = Synset(id)
     print("\n\tSynset with id '{}' has been created".format(synset.id))
     # add the synset to the wordnet
+    wn.add_synset(synset)
     print("\n\tAdded synset with id '{}' to the wordnet".format(synset.id))
 
     # add a literal to synset
-    word = 'iepure'
-    sense = '1'
-    synset = wn.synsets()[0]
-    synset.add_literal(word, sense)
-    synset.save_changes()
-    print("\n\tAdded literal with word '{}' and sense '{}' to "
-          "the synset with id '{}'. Number of literals: {}"
-          .format(word, sense, synset.id, len(synset.literals)))
+    # word = 'iepure'
+    # sense = '1'
+    # synset_id = wn.synsets()[0]
+    # synset.add_literal(word, sense)
+    # synset.save_changes()
+    # print("\n\tAdded literal with word '{}' and sense '{}' to "
+    #       "the synset with id '{}'. Number of literals: {}"
+    #       .format(word, sense, synset.id, len(synset.literals)))
 
     # remove the previous literal from synset. If no id for syset
     # is given then it will remove this literal from all synsets
-    word = "iepure"
-    synset = wn.synsets()[0]
-    synset.remove_literal(word)
-    synset.save_changes()
-    print("\tRemoved literal with word '{}' from the synset with id '{}'. "
-          "Number of literals: {}"
-          .format(word, synset.id, len(synset.literals)))
+    # word = "iepure"
+    # synset = wn.synsets()[0]
+    # synset.remove_literal(word)
+    # synset.save_changes()
+    # print("\tRemoved literal with word '{}' from the synset with id '{}'. "
+    #       "Number of literals: {}"
+    #       .format(word, synset.id, len(synset.literals)))
 
     # generate a new synset
     prefix = 'ENG31-'
@@ -222,28 +223,28 @@ def demo_basic_wordnet_operations():
 
     # get a synset
     word = 'arbore'
-    synset = wn.synsets(word=word)[0]
+    synset_id = wn.synsets(word=word)[0]
     # get the path from a given synset to root in hypermyn tree
     print("\n\tList of synsets from synset with id '{}' to root "
-          "in hypermyn tree: ".format(synset.id))
-    print("\t{}".format(wn.synset_to_root(synset.id)))
+          "in hypermyn tree: ".format(synset_id))
+    print("\t{}".format(wn.synset_to_root(synset_id)))
 
     # get two synsets
-    synset1 = wn.synsets("cal")[2]
-    synset2 = wn.synsets("iepure")[0]
+    synset1_id = wn.synsets("cal")[2]
+    synset2_id = wn.synsets("iepure")[0]
     # get the shortest path between two synsets
-    distance = wn.shortest_path(synset1.id, synset2.id)
+    distance = wn.shortest_path(synset1_id, synset2_id)
     print("\n\tList of synsets containing the shortest path from synset with "
-          "id '{}' to synset with id '{}': ".format(synset1.id, synset2.id))
+          "id '{}' to synset with id '{}': ".format(synset1_id, synset2_id))
     print("\t{}".format(distance))
 
     # get a new synset
-    new_synset = wn.synsets("cal")[2]
+    new_synset_id = wn.synsets("cal")[2]
     # travel the graph with bfs algorithm
     counter = 0
     print("\n\tTravelling breadth-first through wordnet starting with synset "
-          "with id '{}' (first 10 synsets)...".format(new_synset.id))
-    for current_synset, relation, from_synset in wn.bfwalk(new_synset.id):
+          "with id '{}' (first 10 synsets)...".format(new_synset_id))
+    for current_synset, relation, from_synset in wn.bfwalk(new_synset_id):
         # bfwalk is a generator that yields, for each call, a BF step through
         # wordnet do actions with current_synset, relation, from_synset
         print("\t\t Step {}: from synset {}, with relation [{}] to synset {}"
@@ -254,13 +255,12 @@ def demo_basic_wordnet_operations():
             counter += 1
 
     # get the lowest common ancestor in the hypernym tree
-    synset1 = wn.synsets("cal")[2]
-    synset2 = wn.synsets("iepure")[0]
-    x = wn.lowest_common_ancestor(synset1.id, synset2.id)
+    synset1_id = wn.synsets("cal")[2]
+    synset2_id = wn.synsets("iepure")[0]
+    synset_id = wn.lowest_common_ancestor(synset1_id, synset2_id)
     print("\n\tLowest common ancestor in the hypernym tree of synset "
-          "with id '{}' and synset with id '{}':"
-          .format(synset1.id, synset2.id))
-    print("\t{}".format(x))
+          "with id '{}' and synset with id '{}' is '{}':"
+          .format(synset1_id, synset2_id, synset_id))
 
 
 def demo_get_synonymy_antonymy():
@@ -281,23 +281,24 @@ def demo_get_synonymy_antonymy():
           "create pairs from each synset.")
 
     synonyms = []
-    synsets = wn.synsets()
+    synsets_id = wn.synsets()
     # for each synset, we create a list of synonyms between its literals
-    for synset in synsets:
+    for synset_id in synsets_id:
         # the literals object is a dict, but we need only the
         # actual words (not senses)
+        synset = wn.synset(synset_id)
         words = list(synset.literals.keys())
         for i in range(len(words)):
-            for j in range(i+1,len(words)):
+            for j in range(i+1, len(words)):
                 # append a tuple containing a pair of synonym words
                 synonyms.append((words[i], words[j]))
 
     # list a few synonyms
-    print("\n\tList of the first 10 synonyms: ({} total synonym pairs extracted)".format(len(synonyms)))
+    print("\n\tList of the first 10 synonyms: ({} total synonym "
+          "pairs extracted)".format(len(synonyms)))
     for i in range(10):
         print("\t\t {:>20} == {}".format(synonyms[i][0], synonyms[i][1]))
 
-        
     # now, antonyms
     antonyms = []
     print("\n\tWe now want to extract antonyms. We look at all the antonymy r"
@@ -308,11 +309,14 @@ def demo_get_synonymy_antonymy():
     # list of synset pairs
     synset_pairs = []
 
-    synsets = wn.synsets() # extract all synsets
-    for synset in synsets:
+    synsets_id = wn.synsets() # extract all synsets
+    for synset_id in synsets_id:
+        synset = wn.synset(synset_id)
         # extract the antonyms of a synset
-        synset_antonyms = wn.adjacent_synsets(synset.id, relation="near_antonym")
-        for synset_antonym in synset_antonyms: # for each antonym synset
+        synset_antonyms_id = wn.adjacent_synsets(synset.id,
+                                                 relation="near_antonym")
+        for synset_antonym_id in synset_antonyms_id: # for each antonym synset
+            synset_antonym = wn.synset(synset_antonym_id)
             # if the antonymy pair doesn't already exists
             if (synset_antonym, synset) not in synset_pairs:
                 # add the antonym tuple to the list
@@ -335,7 +339,8 @@ def demo_get_synonymy_antonymy():
             antonyms.append(antonym_tuple)
 
     # list a few antonyms
-    print("\n\tList of the first 10 antonyms: ({} total antonym pairs extracted)".format(len(antonyms)))
+    print("\n\tList of the first 10 antonyms: ({} "
+          "total antonym pairs extracted)".format(len(antonyms)))
     for i in range(10):
         print("\t\t {:>20} != {}".format(antonyms[i][0], antonyms[i][1]))
 
@@ -345,10 +350,10 @@ def demo_operations_with_two_wordnets():
 
 
 if __name__ == '__main__':
-    #demo_create_and_edit_synsets()
-    #demo_load_and_save_wordnet()
+    demo_create_and_edit_synsets()
+    demo_load_and_save_wordnet()
     demo_basic_wordnet_operations()
-    #demo_get_synonymy_antonymy()
+    demo_get_synonymy_antonymy()
     # demo_operations_with_two_wordnets() # to be done at a later date
 
     
