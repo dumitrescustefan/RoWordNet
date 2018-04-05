@@ -1,0 +1,7 @@
+/__pycache__/
+/.idea/
+
+# Folder config file
+[Dd]esktop.ini
+/**/[Dd]esktop.ini
+**/[Dd]esktop.ini
