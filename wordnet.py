@@ -599,7 +599,6 @@ class WordNet(object):
             raise WordNetError("Relation '{}' is not a correct relation"
                                .format(relation))
 
-
         synset_id_ancestor = synset_id
         synset_id_to_root = [synset_id]
 
@@ -672,10 +671,14 @@ class WordNet(object):
                                .format(synset_id))
 
         queue = Queue()
-        queue.put(synset_id)
         marked_synsets_id = [synset_id]
         from_synsets_rel = dict()
-        from_synsets_rel[synset_id] = (None, None)
+
+        for adj_synset_id, data in self._graph.adj[synset_id].items():
+            from_synsets_rel[adj_synset_id] = (data['label'],
+                                               synset_id)
+            queue.put(adj_synset_id)
+            marked_synsets_id.append(adj_synset_id)
 
         while not queue.empty():
             cur_synset_id = queue.get()
@@ -687,9 +690,9 @@ class WordNet(object):
                     marked_synsets_id.append(adj_synset_id)
                     queue.put(adj_synset_id)
                     from_synsets_rel[adj_synset_id] = (data['label'],
-                                                       self._synsets[cur_synset_id])
+                                                       cur_synset_id)
 
-            yield self._synsets[cur_synset_id], \
+            yield cur_synset_id, \
                 from_synsets_rel[cur_synset_id][0], \
                 from_synsets_rel[cur_synset_id][1]
 

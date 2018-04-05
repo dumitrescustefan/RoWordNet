@@ -241,18 +241,17 @@ def demo_basic_wordnet_operations():
     new_synset = wn.synsets("cal")[2]
     # travel the graph with bfs algorithm
     counter = 0
-    print("\n\tTravelling breadth-first through wordnet (first 10 synsets)...")
+    print("\n\tTravelling breadth-first through wordnet starting with synset "
+          "with id '{}' (first 10 synsets)...".format(new_synset.id))
     for current_synset, relation, from_synset in wn.bfwalk(new_synset.id):
         # bfwalk is a generator that yields, for each call, a BF step through
         # wordnet do actions with current_synset, relation, from_synset
-        print(from_synset.id) # aici crapa ca from e none la primul pas
-        print("\t\t Step {}: from synset {}, with relation [{}] to synset {}".format(counter, from_synset.id, relation, current_synset.id))
+        print("\t\t Step {}: from synset {}, with relation [{}] to synset {}"
+              .format(counter, from_synset, relation, current_synset))
         if counter >= 10:
             break
         else:
             counter += 1
-    print("\tNumber of synsets that have been travelled through "
-          "in wordnet: {}".format(counter))
 
     # get the lowest common ancestor in the hypernym tree
     synset1 = wn.synsets("cal")[2]
@@ -346,10 +345,10 @@ def demo_operations_with_two_wordnets():
 
 
 if __name__ == '__main__':
-    demo_create_and_edit_synsets()
-    demo_load_and_save_wordnet()
+    #demo_create_and_edit_synsets()
+    #demo_load_and_save_wordnet()
     demo_basic_wordnet_operations()
-    demo_get_synonymy_antonymy()
+    #demo_get_synonymy_antonymy()
     # demo_operations_with_two_wordnets() # to be done at a later date
 
     
