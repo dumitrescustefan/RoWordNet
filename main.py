@@ -1,25 +1,20 @@
 import wordnet
 from synset import Synset
 
+
 def demo_create_and_edit_synsets():
     print("\n\nThis demo shows how to create and edit synsets.\n"+"_"*70)
 
     # create a synset( it's recommended to use the function 'generate_synset_id'
     # from the wordnet class. See the function "demo_basic_wordnet_operations'
     # for more details
-    id = "1"
-    synset = Synset("my_id")
+    id = "my_id"
+    synset = Synset(id)
     print("\n\tSynset with id '{}' has been created.".format(id))
     
     # printing the synset
     print("\n\tPrinting this synset:")
     print(synset)
-
-    # set a new id
-    new_id = "2"
-    synset.id = new_id
-    print("\tSynset's id '{}' has been changed to '{}'"
-          .format(id, synset.id))
 
     # set a pos of type verb
     pos = Synset.Pos.VERB
@@ -44,36 +39,39 @@ def demo_create_and_edit_synsets():
           .format(synset.sumotype))
 
     # add a literal
-    word = "tigru"
-    sense = "animal din savana"
-    synset.add_literal(word=word, sense=sense)
-    print("\n\tA new literal(word='{}', sense='{}') has been added to the "
-          "synset with id '{}'".format(word, sense, synset.id))
+    literal = "tigru"
+    sense = "1"
+    synset.add_literal(literal=literal, sense=sense)
+    print("\n\tA new literal '{}' with sense '{}' has been added to the "
+          "synset with id '{}'".format(literal, sense, synset.id))
     print("\tNumber of literals for synset with id '{}': {}"
           .format(synset.id, len(synset.literals)))
 
     # remove a literal
-    word = "tigru"
-    synset.remove_literal(word=word)
-    print("\n\tThe literal(word='{}', sense='{}') has been removed from the "
-          "synset with id '{}'".format(word, sense, synset.id))
+    literal = "tigru"
+    synset.remove_literal(literal=literal)
+    print("\n\tThe literal '{}' has been removed from the "
+          "synset with id '{}'".format(literal, synset.id))
     print("\tNumber of literals for synset with id '{}': {}"
           .format(synset.id, len(synset.literals)))
 
     # add more literals at once
-    literals = {
-                    'leu': '1',
-                    'lup': '1.1',
-                    'vulpe': 'x'
-               }
-
     print("\n\tAdding literals to a synset. Initially we create them:")
-    print(literals)
+    literals = ['lup', 'vuple', 'caine']
     print("\tDirect addition of {} literals to synset with id '{}'"
           .format(len(literals), synset.id))
     synset.literals = literals
     print("\tNumber of literals for synset with id '{}': {}"
           .format(synset.id, len(synset.literals)))
+
+    # add more senses at once
+    print("\n\tAdding senses to a synset. Initially we create them:")
+    literals_senses = ['1', '2', 'x']
+    print("\tDirect addition of {} senses to synset with id '{}'"
+          .format(len(literals_senses), synset.id))
+    synset.literals_senses = literals_senses
+    print("\tNumber of senses for synset with id '{}': {}"
+          .format(synset.id, len(synset.literals_senses)))
 
 
 def demo_load_and_save_wordnet():
@@ -139,21 +137,21 @@ def demo_basic_wordnet_operations():
     print("\tTotal number of adverb synsets: {}"
           .format(len(synsets_id_adverbs)))
 
-    # search for a word in all synsets.
+    # search for a literal in all synsets.
     # Returns an empty list if none is found.
-    search_word = 'arbore'
-    synsets_id = wn.synsets(word=search_word)
-    print("\n\tTotal number of synsets containing word '{}': {}\n"
-          .format(search_word, len(synsets_id)))
+    search_literal = 'arbore'
+    synsets_id = wn.synsets(literal=search_literal)
+    print("\n\tTotal number of synsets containing literal '{}': {}\n"
+          .format(search_literal, len(synsets_id)))
 
-    # search for a word in all noun synsets
-    search_word = 'cal'
-    synsets_id = wn.synsets(word=search_word, pos=Synset.Pos.NOUN)
-    print("\tTotal number of noun synsets containing word '{}': {}"
-          .format(search_word, len(synsets_id)))
+    # search for a literal in all noun synsets
+    search_literal = 'cal'
+    synsets_id = wn.synsets(literal=search_literal, pos=Synset.Pos.NOUN)
+    print("\tTotal number of noun synsets containing literal '{}': {}"
+          .format(search_literal, len(synsets_id)))
 
     # get the adjacent synsets of a synset.
-    synset_id = wn.synsets(word='cal')[2]
+    synset_id = wn.synsets(literal='cal')[2]
     adj_synsets_id = wn.adjacent_synsets(synset_id)
     print("\n\tSynset with id '{}' has {} adjacent synsets"
           .format(synset_id, len(adj_synsets_id)))
@@ -182,28 +180,28 @@ def demo_basic_wordnet_operations():
     print("\n\tAdded synset with id '{}' to the wordnet".format(synset.id))
 
     # add a literal to synset
-    word = 'iepure'
+    literal = 'iepure'
     sense = '1'
     # get a synset
     synset_id = wn.synsets()[0]
     synset = wn.synset(synset_id)
     # add a literal to the synset
-    synset.add_literal(word, sense)
+    synset.add_literal(literal, sense)
     # tell the wordnet that synsets's literals have been changed. This step is
     # necessary for a correct internal representation.
     wn.reindex_literals()
-    print("\n\tAdded literal with word '{}' and sense '{}' to "
-          "the synset with id '{}'. Number of synsets containing word '{}': {}"
-          .format(word, sense, synset.id, word, len(wn.synsets(word))))
+    print("\n\tAdded literal with literal '{}' and sense '{}' to the "
+          "synset with id '{}'. Number of synsets containing literal '{}': {}"
+          .format(literal, sense, synset.id, literal, len(wn.synsets(literal))))
 
     # remove the previous literal from synset.
-    synset.remove_literal(word)
+    synset.remove_literal(literal)
     # again, we have to tell the wordnet that synset's literals have been
     # changed.
     wn.reindex_literals()
-    print("\tRemoved literal with word '{}' from the synset with id '{}'. "
-          "Number of synsets containing word '{}': {}"
-          .format(word, synset.id, word, len(wn.synsets(word))))
+    print("\tRemoved literal with literal '{}' from the synset with id '{}'. "
+          "Number of synsets containing literal '{}': {}"
+          .format(literal, synset.id, literal, len(wn.synsets(literal))))
 
     # generate a new synset
     prefix = 'ENG31-'
@@ -226,8 +224,7 @@ def demo_basic_wordnet_operations():
           "id '{}'".format(synset.id, new_synset.id))
 
     # get a synset
-    word = 'arbore'
-    synset_id = wn.synsets(word=word)[0]
+    synset_id = wn.synsets()[0]
     # get the path from a given synset to root in hypermyn tree
     print("\n\tList of synsets from synset with id '{}' to root "
           "in hypermyn tree: ".format(synset_id))
@@ -289,13 +286,13 @@ def demo_get_synonymy_antonymy():
     # for each synset, we create a list of synonyms between its literals
     for synset_id in synsets_id:
         # the literals object is a dict, but we need only the
-        # actual words (not senses)
+        # actual literals (not senses)
         synset = wn.synset(synset_id)
-        words = list(synset.literals.keys())
-        for i in range(len(words)):
-            for j in range(i+1, len(words)):
-                # append a tuple containing a pair of synonym words
-                synonyms.append((words[i], words[j]))
+        literals = list(synset.literals)
+        for i in range(len(literals)):
+            for j in range(i+1, len(literals)):
+                # append a tuple containing a pair of synonym literals
+                synonyms.append((literals[i], literals[j]))
 
     # list a few synonyms
     print("\n\tList of the first 10 synonyms: ({} total synonym "
@@ -313,13 +310,13 @@ def demo_get_synonymy_antonymy():
     # list of synset pairs
     synset_pairs = []
 
-    synsets_id = wn.synsets() # extract all synsets
+    synsets_id = wn.synsets()  # extract all synsets
     for synset_id in synsets_id:
         synset = wn.synset(synset_id)
         # extract the antonyms of a synset
         synset_antonyms_id = wn.adjacent_synsets(synset.id,
                                                  relation="near_antonym")
-        for synset_antonym_id in synset_antonyms_id: # for each antonym synset
+        for synset_antonym_id in synset_antonyms_id:  # for each antonym synset
             synset_antonym = wn.synset(synset_antonym_id)
             # if the antonymy pair doesn't already exists
             if (synset_antonym, synset) not in synset_pairs:
@@ -331,9 +328,9 @@ def demo_get_synonymy_antonymy():
     literal_pairs = []
     for synset_pair in synset_pairs:
         # extract the literals of the first synset in the pair
-        synset1_literals = list(synset_pair[0].literals.keys())
+        synset1_literals = list(synset_pair[0].literals)
         # extract the literals of the second synset in the pair
-        synset2_literals = list(synset_pair[1].literals.keys())
+        synset2_literals = list(synset_pair[1].literals)
         # add a tuple containing the literals of each synset
         literal_pairs.append((synset1_literals, synset2_literals))
 
@@ -358,6 +355,7 @@ if __name__ == '__main__':
     demo_load_and_save_wordnet()
     demo_basic_wordnet_operations()
     demo_get_synonymy_antonymy()
+
     # demo_operations_with_two_wordnets() # to be done at a later date
 
 

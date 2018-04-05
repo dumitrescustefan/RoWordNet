@@ -130,11 +130,11 @@ class WordNet(object):
         root = et.parse(filename).getroot()
 
         for child in root:
-            synset = Synset('0')
+            synset = None
 
             for element in child:
                 if element.tag == 'ID':
-                    synset.id = element.text
+                    synset = Synset(element.text)
 
                 if element.tag == 'POS':
                     dic_chr2pos = {
@@ -147,8 +147,12 @@ class WordNet(object):
                     synset.pos = pos
 
                 if element.tag == 'SYNONYM':
-                    synset.literals = {literal.text: literal[0].text
-                                       for literal in element}
+                    synset.literals = [literal.text for literal in element]
+                    for literal in element:
+                        synset.literals_senses.append(literal[0].text
+                                                      if literal is not None
+                                                      else ""
+                                                      )
                     for literal in element:
                         self._literal2synset[literal.text].append(synset.id)
 
@@ -205,8 +209,8 @@ class WordNet(object):
 
         for synset_id in synsets_id:
             synset = wn.synset(synset_id)
-            for word in synset.literals.keys():
-                self._literal2synset[word].append(synset_id)
+            for literal in synset.literals:
+                self._literal2synset[literal].append(synset_id)
 
     def _save_to_xml(self, filename):
         root = et.Element("ROWN")
@@ -222,7 +226,9 @@ class WordNet(object):
             for literal in synset.literals:
                 lit = et.SubElement(synonym, "LITERAL")
                 lit.text = literal
-                et.SubElement(lit, "TYPE").text = "type"
+                literal_index = synset.literals.index(literal)
+                literal_sense = synset.literals_senses[literal_index]
+                et.SubElement(lit, "SENSE").text = literal_sense
 
             if synset.stamp is not None:
                 et.SubElement(syn, "STAMP").text = synset.stamp
@@ -255,14 +261,14 @@ class WordNet(object):
     def _save_to_binary(self, filename):
         pickle.dump(self, open(filename, "wb"))
 
-    def synsets(self, word: str=None, pos: Synset.Pos=None):
+    def synsets(self, literal: str=None, pos: Synset.Pos=None):
         """
-            Get a list of synsets. If a word is given, only the synsets that
-            contain that word will be selected. If a pos is given, only the
+            Get a list of synsets. If a literal is given, only the synsets that
+            contain that literal will be selected. If a pos is given, only the
             synsets that have that pos will be selected.
 
             Args:
-                word (str, optional): The word that synsets must contain.
+                literal (str, optional): The literal that synsets must contain.
                     Defaults to None.
                 pos (Synset.Pos, optional): The type of pos that synsets
                     must have. Defaults to None.
@@ -277,18 +283,18 @@ class WordNet(object):
 
         """
 
-        if word is None:
+        if literal is None:
             synsets_id = list(self._synsets.keys())
         else:
-            if not isinstance(word, str):
-                raise TypeError("Argument 'word' has incorrect type, "
+            if not isinstance(literal, str):
+                raise TypeError("Argument 'literal' has incorrect type, "
                                 "expected str, got {}"
-                                .format(type(word).__name__))
+                                .format(type(literal).__name__))
 
-            if word not in self._literal2synset:
+            if literal not in self._literal2synset:
                 return []
 
-            synsets_id = self._literal2synset[word]
+            synsets_id = self._literal2synset[literal]
 
         if pos is not None:
             if not isinstance(pos, Synset.Pos):
@@ -301,6 +307,49 @@ class WordNet(object):
 
         return synsets_id
 
+    def print_synset(self, synset_id):
+        """
+            Fully prints a synset.
+
+            Args:
+                synset_id(str): Id of the synset.
+
+            Raises:
+                TypeError: If any argument has incorrect type.
+                WordNerError: If there's no synset with the given id in the
+                    wordnet.
+        """
+
+        if not isinstance(synset_id, str):
+            raise TypeError("Argument 'synset_id' has incorrect type, "
+                            "expected str, got {}"
+                            .format(type(synset_id).__name__))
+        if synset_id not in self._synsets:
+            raise WordNetError("Synset with id '{}' is not in the wordnet"
+                               .format(synset_id))
+
+        synset = self.synset(synset_id)
+
+        output = "Synset(id={!r}, pos={!r}, nonlexicalized={!r}, stamp={!r}, " \
+                 "domain={!r}\n\t  definition={!r}" \
+                 "\n\t  sumo={!r}, sumoType={!r}, sentiwn={!r})". \
+            format(synset.id, synset.pos, synset.nonlexicalized, synset.stamp,
+                   synset.domain, synset.definition,
+                   synset.sumo, synset.sumotype, synset.sentiwn)
+
+        output += "\n\t  Literals:"
+        for i in range(len(synset.literals)):
+            output += "\n\t\t  {!r}:{!r}".format(synset.literals[i],
+                                                 synset.literals_senses[i])
+
+        output += "\n"
+
+        adj_synsets_id = list(self._graph.adj[synset_id].keys())
+        output += "\t  Adjacent synsets: "
+        output += str(adj_synsets_id)
+
+        print(output)
+
     def reindex_literals(self):
         """
             Reindex all literals to the synsets. This is used if the literals of
@@ -309,8 +358,8 @@ class WordNet(object):
 
         self._literal2synset.clear()
         for synset in self._synsets.values():
-            for word in synset.literals.keys():
-                self._literal2synset[word].append(synset.id)
+            for literal in synset.literals:
+                self._literal2synset[literal].append(synset.id)
 
     def adjacent_synsets(self, synset_id: str, relation: str=None,
                          show_relations: bool=False):
