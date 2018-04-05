@@ -33,7 +33,7 @@ class Synset(object):
 
     def __init__(self, id, pos=None, nonlexicalized=None, definition=None,
                  stamp=None, sentiwn=None, domain=None, sumo=None,
-                 sumotype=None, literals=None):
+                 sumotype=None, literals=None, literals_senses=None):
         """
             Initialize a synset object:
 
@@ -49,7 +49,7 @@ class Synset(object):
                 sumo (str, optional): The sumo of the synset.
                 sumotype (SumoType, optional): The type of sumo.
                 literals (dict, optional): The literals of synsets. First
-                    argument represents the word and the second one represents
+                    argument represents the literal and the second one represents
                     the sense.
 
             Raises:
@@ -62,8 +62,10 @@ class Synset(object):
                             "expected str, got {}"
                             .format(type(id).__name__))
 
-        self.id = id
-        self._literals = {} if literals is None else literals
+        self._id = id
+        self._literals = [] if literals is None else literals
+        self._literals_senses = [] if literals_senses is None \
+                                   else literals_senses
         self._pos = pos
         self._definition = definition
         self._stamp = stamp
@@ -81,44 +83,57 @@ class Synset(object):
             Setter recieves a string containing the id.
         """
         return self._id
-        
-    @id.setter
-    def id(self, value):
-        if not isinstance(value, str):
-            raise TypeError("Argument 'value' has incorrect type, "
-                            "expected str, got {}"
-                            .format(type(value).__name__))
-
-        self._id = value
 
     @property
     def literals(self):
         """
-            Get/set the literals( dict of 'str': 'str') of this synset.
-                Keys represent the words and values represent the sense.
+            Get/set the literals of this synset.
             Getter returns the literals of this synset.
-            Setters recieves the literals as dict.
+            Setters recieves the literals as list.
         """
         return self._literals
         
     @literals.setter
     def literals(self, value):
-        if not isinstance(value, dict):
+        if not isinstance(value, list):
             raise TypeError("Argument 'value' has incorrect type, "
-                            "expected dict, got {}"
+                            "expected list, got {}"
                             .format(type(value).__name__))
 
-        for word, sense in value.items():
-            if not isinstance(word, str):
-                raise TypeError("Argument 'word-value' has incorrect type, "
+        for literal in value:
+            if not isinstance(literal, str):
+                raise TypeError("Argument 'literal-value' has incorrect type, "
                                 "expected str, got {}"
-                                .format(type(word).__name__))
+                                .format(type(literal).__name__))
+
+        self._literals_senses = ["" for i in range(len(value))]
+        self._literals = value
+
+    @property
+    def literals_senses(self):
+        """
+            Get/set the senses for each literal of this synset. Senses's indexes
+                correspond to literals's.
+            Setter returns the senses of each literal of this synset.
+            Setters recieves the senses as list.
+        """
+
+        return self._literals_senses
+
+    @literals_senses.setter
+    def literals_senses(self, value):
+        if not isinstance(value, list):
+            raise TypeError("Argument 'value' has incorrect type, "
+                            "expected list, got {}"
+                            .format(type(value).__name__))
+
+        for sense in value:
             if not isinstance(sense, str):
                 raise TypeError("Argument 'sense-value' has incorrect type, "
                                 "expected str, got {}"
                                 .format(type(sense).__name__))
 
-        self._literals = value
+        self._literals_senses = value
            
     @property
     def sentiwn(self):
@@ -280,47 +295,44 @@ class Synset(object):
 
         self._stamp = value
 
-    def add_literal(self, word, sense):
+    def add_literal(self, literal, sense):
         """
             Add a literal to the synset.
 
             Args:
-                word (str): Word of the literal.
+                literal (str): The value of the literal.
                 sense (str): Sense of the literal.
 
             Raises:
-                SynsetError: If the word is already in the synset.
+                SynsetError: If the literal is already in the synset.
         """
-        if word in self._literals:
-            raise SynsetError("Word '{}' is already in the synset".format(word))
+        if literal in self._literals:
+            raise SynsetError("Literal '{}' is already in the synset"
+                              .format(literal))
 
-        self._literals[word] = sense
+        self._literals.append(literal)
+        self._literals_senses.append(sense)
 
-    def remove_literal(self, word):
+    def remove_literal(self, literal):
         """
             Remove a literal from the synset.
 
             Args:
-                word (str): Word of the literal.
+                literal (str): Literal of the synset.
 
             Raises:
-                SynsetError: If there's no literal containing this word.
+                SynsetError: If there's no literal with this value in
+                    the synset.
         """
 
-        if word not in self._literals:
-            raise SynsetError("Word '{}' is not in the synset".format(word))
-        self._literals.pop(word)
+        if literal not in self._literals:
+            raise SynsetError("literal '{}' is not in the synset".format(literal))
+
+        index = self._literals.index(literal)
+        self._literals.remove(literal)
+        del self._literals_senses[index]
 
     def __repr__(self):
-        output = "Synset(id={!r}, pos={!r}, nonlexicalized={!r}, stamp={!r}, domain={!r}\n\t  definition={!r}" \
-                 "\n\t  Sumo={!r}, SumoType={!r}, sentiwn={!r})".\
-                 format(self._id, self._pos, self._nonlexicalized, self._stamp, self._domain, self._definition,
-                        self._sumo, self._sumotype, self._sentiwn)
-
-        for literal, sense in self.literals.items():
-            output += "\n\t  {!r}={!r}".format(literal, sense)
-
-        output += "\n"
-
-        return output
+        return "Synset(id={!r}, literals={!r}, definition={!r})"\
+               .format(self._id, self._literals, self._definition)
 

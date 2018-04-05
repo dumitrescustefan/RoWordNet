@@ -37,14 +37,14 @@ class Similarity(object):
 
         return len(gloss.intersection(sentence))
 
-    def _simplified_lesk(self, word, sentence):
+    def _simplified_lesk(self, literal, sentence):
         best_sense = None;
         max_overlap = 0
 
-        for synset in self._wordnet.synsets(word):
+        for synset in self._wordnet.synsets(literal):
             overlap = self._overlap_context(synset, sentence)
 
-            for hyponym in wn.adj_synsets(synset.id, "hyponym"):
+            for hyponym in wn.adjacent_synsets(synset.id, "hyponym"):
                 overlap += self._overlap_context(hyponym, sentence)
 
             if overlap > max_overlap:
