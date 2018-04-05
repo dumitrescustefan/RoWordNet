@@ -1,27 +1,6 @@
 import wordnet
 from synset import Synset
 
-
-def intersection(wordnet_object_1, wordnet_object_2):
-    return None
-
-
-def union (wordnet_object_1, wordnet_object_2):
-    return None
-
-
-def merge (wordnet_object_1, wordnet_object_2):    
-    return None
-
-
-def complement (wordnet_object_1, wordnet_object_2):
-    return None
-
-
-def difference (wordnet_object_1, wordnet_object_2):
-    return None
-
-
 def demo_create_and_edit_synsets():
     print("\n\nThis demo shows how to create and edit synsets.\n"+"_"*70)
 
@@ -103,7 +82,7 @@ def demo_load_and_save_wordnet():
     print("\n\nThis demo shows how to initialize, "
           "save and load a wordnet object.\n" + "_"*70)
     # load internal wordnet
-    print("\n\t Loading from internal resources")
+    print("\n\t Loading from internal resources (binary)")
     start = time.perf_counter()
     wn = wordnet.WordNet()
     print("\t\t... done in {:.3f}s".format(time.perf_counter() - start))
@@ -175,12 +154,12 @@ def demo_basic_wordnet_operations():
 
     # get the adjacent synsets of a synset.
     synset = wn.synsets(word='cal')[2]
-    adj_synsets = wn.adj_synsets(synset.id)
+    adj_synsets = wn.adjacent_synsets(synset.id)
     print("\n\tSynset with id '{}' has {} adjacent synsets"
           .format(synset.id, len(adj_synsets)))
     # get all adjacent synsets with a specific relation of this synset.
     relation = "hyponym"
-    adj_synsets = wn.adj_synsets(synset.id, relation=relation)
+    adj_synsets = wn.adjacent_synsets(synset.id, relation=relation)
     print("\tSynset with id '{}' has {} {} relations"
           .format(synset.id, len(adj_synsets), relation))
 
@@ -266,7 +245,9 @@ def demo_basic_wordnet_operations():
     for current_synset, relation, from_synset in wn.bfwalk(new_synset.id):
         # bfwalk is a generator that yields, for each call, a BF step through
         # wordnet do actions with current_synset, relation, from_synset
-        if counter > 10:
+        print(from_synset.id) # aici crapa ca from e none la primul pas
+        print("\t\t Step {}: from synset {}, with relation [{}] to synset {}".format(counter, from_synset.id, relation, current_synset.id))
+        if counter >= 10:
             break
         else:
             counter += 1
@@ -313,10 +294,11 @@ def demo_get_synonymy_antonymy():
                 synonyms.append((words[i], words[j]))
 
     # list a few synonyms
-    print("\n\tList of the first 10 synonyms:")
+    print("\n\tList of the first 10 synonyms: ({} total synonym pairs extracted)".format(len(synonyms)))
     for i in range(10):
-        print("\t\t {} == {}".format(synonyms[i][0], synonyms[i][1]))
+        print("\t\t {:>20} == {}".format(synonyms[i][0], synonyms[i][1]))
 
+        
     # now, antonyms
     antonyms = []
     print("\n\tWe now want to extract antonyms. We look at all the antonymy r"
@@ -330,7 +312,7 @@ def demo_get_synonymy_antonymy():
     synsets = wn.synsets() # extract all synsets
     for synset in synsets:
         # extract the antonyms of a synset
-        synset_antonyms = wn.adj_synsets(synset.id, relation="near_antonym")
+        synset_antonyms = wn.adjacent_synsets(synset.id, relation="near_antonym")
         for synset_antonym in synset_antonyms: # for each antonym synset
             # if the antonymy pair doesn't already exists
             if (synset_antonym, synset) not in synset_pairs:
@@ -354,25 +336,21 @@ def demo_get_synonymy_antonymy():
             antonyms.append(antonym_tuple)
 
     # list a few antonyms
-    print("\n\tList of the first 10 antonyms:")
+    print("\n\tList of the first 10 antonyms: ({} total antonym pairs extracted)".format(len(antonyms)))
     for i in range(10):
-        print("\t\t {} == {}".format(antonyms[i][0], antonyms[i][1]))
+        print("\t\t {:>20} != {}".format(antonyms[i][0], antonyms[i][1]))
 
 
 def demo_operations_with_two_wordnets():
     pass
 
-def this_is_a_test_function():
-    pass
-
 
 if __name__ == '__main__':
-    #demo_create_and_edit_synsets()
-    #demo_load_and_save_wordnet()
-    #demo_basic_wordnet_operations()
+    demo_create_and_edit_synsets()
+    demo_load_and_save_wordnet()
+    demo_basic_wordnet_operations()
     demo_get_synonymy_antonymy()
-
-    # demo_operations_with_two_wordnets()
+    # demo_operations_with_two_wordnets() # to be done at a later date
 
     
 
