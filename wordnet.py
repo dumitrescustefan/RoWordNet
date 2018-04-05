@@ -196,7 +196,7 @@ class WordNet(object):
         synsets = wn.synsets()
 
         for synset in synsets:
-            adj_synsets = wn.adj_synsets(synset.id, show_relations=True)
+            adj_synsets = wn.adjacent_synsets(synset.id, show_relations=True)
             for adj_synset, relation in adj_synsets:
                 self._graph.add_edge(synset.id, adj_synset.id, label=relation)
 
@@ -301,7 +301,7 @@ class WordNet(object):
 
         return synsets
 
-    def adj_synsets(self, synset_id: str, relation: str=None,
+    def adjacent_synsets(self, synset_id: str, relation: str=None,
                     show_relations: bool=False):
         """
             Get the adjacent synsets of a synset with/without type of relations
@@ -734,3 +734,23 @@ class WordNet(object):
         pass
 
 
+
+
+def intersection(wordnet_object_1, wordnet_object_2):
+    return None
+
+
+def union (wordnet_object_1, wordnet_object_2):
+    return None
+
+
+def merge (wordnet_object_1, wordnet_object_2):    
+    return None
+
+
+def complement (wordnet_object_1, wordnet_object_2):
+    return None
+
+
+def difference (wordnet_object_1, wordnet_object_2):
+    return None
