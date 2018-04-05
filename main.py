@@ -357,7 +357,7 @@ if __name__ == '__main__':
     demo_create_and_edit_synsets()
     demo_load_and_save_wordnet()
     demo_basic_wordnet_operations()
-    #demo_get_synonymy_antonymy()
+    demo_get_synonymy_antonymy()
     # demo_operations_with_two_wordnets() # to be done at a later date
 
 
