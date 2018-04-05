@@ -182,24 +182,28 @@ def demo_basic_wordnet_operations():
     print("\n\tAdded synset with id '{}' to the wordnet".format(synset.id))
 
     # add a literal to synset
-    # word = 'iepure'
-    # sense = '1'
-    # synset_id = wn.synsets()[0]
-    # synset.add_literal(word, sense)
-    # synset.save_changes()
-    # print("\n\tAdded literal with word '{}' and sense '{}' to "
-    #       "the synset with id '{}'. Number of literals: {}"
-    #       .format(word, sense, synset.id, len(synset.literals)))
+    word = 'iepure'
+    sense = '1'
+    # get a synset
+    synset_id = wn.synsets()[0]
+    synset = wn.synset(synset_id)
+    # add a literal to the synset
+    synset.add_literal(word, sense)
+    # tell the wordnet that synsets's literals have been changed. This step is
+    # necessary for a correct internal representation.
+    wn.reindex_literals()
+    print("\n\tAdded literal with word '{}' and sense '{}' to "
+          "the synset with id '{}'. Number of synsets containing word '{}': {}"
+          .format(word, sense, synset.id, word, len(wn.synsets(word))))
 
-    # remove the previous literal from synset. If no id for syset
-    # is given then it will remove this literal from all synsets
-    # word = "iepure"
-    # synset = wn.synsets()[0]
-    # synset.remove_literal(word)
-    # synset.save_changes()
-    # print("\tRemoved literal with word '{}' from the synset with id '{}'. "
-    #       "Number of literals: {}"
-    #       .format(word, synset.id, len(synset.literals)))
+    # remove the previous literal from synset.
+    synset.remove_literal(word)
+    # again, we have to tell the wordnet that synset's literals have been
+    # changed.
+    wn.reindex_literals()
+    print("\tRemoved literal with word '{}' from the synset with id '{}'. "
+          "Number of synsets containing word '{}': {}"
+          .format(word, synset.id, word, len(wn.synsets(word))))
 
     # generate a new synset
     prefix = 'ENG31-'
@@ -353,10 +357,9 @@ if __name__ == '__main__':
     demo_create_and_edit_synsets()
     demo_load_and_save_wordnet()
     demo_basic_wordnet_operations()
-    demo_get_synonymy_antonymy()
+    #demo_get_synonymy_antonymy()
     # demo_operations_with_two_wordnets() # to be done at a later date
 
-    
 
 
 

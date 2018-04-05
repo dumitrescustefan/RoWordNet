@@ -183,7 +183,6 @@ class WordNet(object):
                     synset.sentiwn = [float(subelement.text)
                                       for subelement in element]
 
-            synset.add_wordnet(self)
             self._synsets[synset.id] = synset
 
     def _load_from_binary(self, filename):
@@ -301,6 +300,17 @@ class WordNet(object):
                           if self._synsets[synset_id].pos == pos]
 
         return synsets_id
+
+    def reindex_literals(self):
+        """
+            Reindex all literals to synsets. This is used if literals of a
+            synset are changed.
+        """
+
+        self._literal2synset.clear()
+        for synset in self._synsets.values():
+            for word in synset.literals.keys():
+                self._literal2synset[word].append(synset.id)
 
     def adjacent_synsets(self, synset_id: str, relation: str=None,
                          show_relations: bool=False):
@@ -467,19 +477,8 @@ class WordNet(object):
 
         self._graph.add_node(synset.id)
         self._synsets[synset.id] = synset
-        synset.add_wordnet(self)
         for literal in synset.literals:
             self._literal2synset[literal].append(synset.id)
-
-    def update_synset(self, synset):
-        if synset.id not in self._synsets:
-            raise WordNetError("Synset with id '{}' is not in the wordnet"
-                               .format(synset.id))
-        else:
-            self._synsets[synset.id] = synset
-
-            for word in synset.literals:
-                self._literal2synset[word].append(synset.id)
 
     def add_relation(self, synset_id1, synset_id2, relation):
         """
