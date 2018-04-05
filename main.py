@@ -362,6 +362,9 @@ def demo_get_synonymy_antonymy():
 def demo_operations_with_two_wordnets():
     pass
 
+def this_is_a_test_function():
+    pass
+
 
 if __name__ == '__main__':
     #demo_create_and_edit_synsets()
