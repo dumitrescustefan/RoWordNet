@@ -303,8 +303,8 @@ class WordNet(object):
 
     def reindex_literals(self):
         """
-            Reindex all literals to synsets. This is used if literals of a
-            synset are changed.
+            Reindex all literals to the synsets. This is used if the literals of
+            a synset have been changed.
         """
 
         self._literal2synset.clear()
