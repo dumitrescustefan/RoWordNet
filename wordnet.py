@@ -8,7 +8,7 @@ from errors.exceptions import WordNetError
 
 
 class WordNet(object):
-    def __init__(self, filename=None, empty=False, xml=True):
+    def __init__(self, filename=None, empty=False, xml=False):
         """
             Initialize a wordnet object.
             
@@ -69,7 +69,7 @@ class WordNet(object):
 
         return self._relations_type
 
-    def save(self, filename: str, xml: bool=True):
+    def save(self, filename: str, xml: bool=False):
         """
             Save a wordnet object in a given file.
             
@@ -77,7 +77,7 @@ class WordNet(object):
                 filename (str): The file where the wordnet will be saved.
                 xml (bool, optional): If set to True, it will save in xml
                     format. If set to False it will save in binary format.
-                    Defaults to True.
+                    Defaults to False.
 
             Raises:
                 TypeError: If any argument has incorrect type.
@@ -96,7 +96,7 @@ class WordNet(object):
         elif xml is False:
             self._save_to_binary(filename)
 
-    def load(self, filename: str, xml: bool=True):
+    def load(self, filename: str, xml: bool=False):
         """
             Load a wordnet object from a given file.
 
@@ -105,7 +105,7 @@ class WordNet(object):
                     will be loaded.
                 xml (bool, optional): If set to True, it will load from xml
                     format. If set to False, it will load from binary format.
-                    Defaults to True.
+                    Defaults to False.
 
             Raises:
                 TypeError: If any argument has incorrect type.
@@ -127,7 +127,8 @@ class WordNet(object):
     def _load_from_xml(self, filename):
         self._clean()
 
-        root = et.parse(filename).getroot()
+        parser = et.XMLParser(encoding="utf-8")
+        root = et.parse(filename, parser).getroot()
 
         for child in root:
             synset = None

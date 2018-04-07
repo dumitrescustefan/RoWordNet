@@ -85,22 +85,16 @@ def demo_load_and_save_wordnet():
     wn = wordnet.WordNet()
     print("\t\t... done in {:.3f}s".format(time.perf_counter() - start))
 
-    # save wordnet to xml
-    print("\n\t Saving the wordnet in xml file")
-    start = time.perf_counter()
-    wn.save("resources/save_wn.xml")
-    print("\t\t... done in {:.3f}s".format(time.perf_counter()-start))
-
     # load wordnet from xml
     print("\n\t Load the wordnet from xml file")
     start = time.perf_counter()
-    wn.load("resources/save_wn.xml")
+    wn.load("resources/xml_wn.xml", xml=True)
     print("\t\t... done in {:.3f}s".format(time.perf_counter() - start))
 
-    # save wordnet to binary
-    print("\n\t Saving the wordnet in binary file")
+    # save wordnet to xml
+    print("\n\t Saving the wordnet in xml file")
     start = time.perf_counter()
-    wn.save("resources/binary_wn.pck", xml=False)
+    wn.save("resources/xml_wn.xml", xml=True)
     print("\t\t... done in {:.3f}s".format(time.perf_counter() - start))
 
     # load wordnet to binary
@@ -108,6 +102,12 @@ def demo_load_and_save_wordnet():
     start = time.perf_counter()
     wn.load("resources/binary_wn.pck", xml=False)
     print("\t\t... done in {:.3f}s".format(time.perf_counter() - start))
+
+    # save wordnet to binary
+    print("\n\t Saving the wordnet in binary file")
+    start = time.perf_counter()
+    wn.save("binary_wn.pck")
+    print("\t\t... done in {:.3f}s".format(time.perf_counter()-start))
 
 
 def demo_basic_wordnet_operations():
@@ -136,6 +136,11 @@ def demo_basic_wordnet_operations():
     synsets_id_adverbs = wn.synsets(pos=Synset.Pos.ADVERB)
     print("\tTotal number of adverb synsets: {}"
           .format(len(synsets_id_adverbs)))
+
+    # get a synset and print a detailed information about it
+    print("\n\t Print a detailed information about a synset:\n")
+    synset_id = wn.synsets()[0]
+    wn.print_synset(synset_id)
 
     # search for a literal in all synsets.
     # Returns an empty list if none is found.
@@ -227,7 +232,7 @@ def demo_basic_wordnet_operations():
     synset_id = wn.synsets()[0]
     # get the path from a given synset to root in hypermyn tree
     print("\n\tList of synsets from synset with id '{}' to root "
-          "in hypermyn tree: ".format(synset_id))
+          "in the hypermyn tree: ".format(synset_id))
     print("\t{}".format(wn.synset_to_root(synset_id)))
 
     # get two synsets
@@ -259,7 +264,7 @@ def demo_basic_wordnet_operations():
     synset1_id = wn.synsets("cal")[2]
     synset2_id = wn.synsets("iepure")[0]
     synset_id = wn.lowest_common_ancestor(synset1_id, synset2_id)
-    print("\n\tLowest common ancestor in the hypernym tree of synset "
+    print("\n\tThe lowest common ancestor in the hypernym tree of synset "
           "with id '{}' and synset with id '{}' is '{}':"
           .format(synset1_id, synset2_id, synset_id))
 
@@ -295,9 +300,9 @@ def demo_get_synonymy_antonymy():
                 synonyms.append((literals[i], literals[j]))
 
     # list a few synonyms
-    print("\n\tList of the first 10 synonyms: ({} total synonym "
+    print("\n\tList of the first 5 synonyms: ({} total synonym "
           "pairs extracted)".format(len(synonyms)))
-    for i in range(10):
+    for i in range(5):
         print("\t\t {:>20} == {}".format(synonyms[i][0], synonyms[i][1]))
 
     # now, antonyms

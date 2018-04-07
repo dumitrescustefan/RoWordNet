@@ -295,7 +295,7 @@ class Synset(object):
 
         self._stamp = value
 
-    def add_literal(self, literal, sense):
+    def add_literal(self, literal, sense=""):
         """
             Add a literal to the synset.
 
