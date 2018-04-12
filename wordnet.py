@@ -4,7 +4,7 @@ import lxml.etree as et
 from collections import defaultdict
 import pickle
 from queue import Queue
-from errors.exceptions import WordNetError
+from exceptions import WordNetError
 
 
 class WordNet(object):
