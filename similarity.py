@@ -1,4 +1,4 @@
-from wordnet import WordNet
+from rowordnet import RoWordNet
 from preprocessing.corpus import *
 
 
