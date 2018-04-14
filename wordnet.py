@@ -19,6 +19,7 @@ class WordNet(object):
                     editing purposes, etc.) . Defaults to False.
                 xml (bool, optional): If set to True the wordnet will be loaded from an xml file. If set to False the
                     wordnet will be loaded from a binary file.
+
             Raises:
                 TypeError: If any argument has incorrect type.
         """
@@ -54,6 +55,7 @@ class WordNet(object):
     def relations_type(self):
         """
             Gets all types of possible relations between synsets.
+
             Returns:
                 list of str: A list containing all types of possible relations between synsets.
         """
@@ -68,6 +70,7 @@ class WordNet(object):
                 filename (str): The file where the wordnet will be saved.
                 xml (bool, optional): If set to True, it will save in xml format. If set to False it will save in binary
                     format. Defaults to False.
+
             Raises:
                 TypeError: If any argument has incorrect type.
         """
@@ -86,10 +89,12 @@ class WordNet(object):
     def load(self, filename: str, xml: bool=False):
         """
             Load a wordnet object from a given file.
+
             Args:
                 filename (str): The file from where wordnet will be loaded.
                 xml (bool, optional): If set to True, it will load from xml format. If set to False, it will load from
                     binary format. Defaults to False.
+
             Raises:
                 TypeError: If any argument has incorrect type.
         """
@@ -242,14 +247,18 @@ class WordNet(object):
         """
             Get a list of synsets. If a literal is given, only the synsets that contain that literal will be selected.
             If a pos is given, only the synsets that have that pos will be selected.
+
             Args:
                 literal (str, optional): The literal that synsets must contain. Defaults to None.
                 pos (Synset.Pos, optional): The type of pos that synsets must have. Defaults to None.
+
             Returns:
                 list of Synsets: A list containing the desired synsets. If no synset with the given word is found, it
                 will return an empty list.
+
             Raises:
                 TypeError: If any argument has incorrect type.
+
         """
 
         if literal is None:
@@ -276,8 +285,10 @@ class WordNet(object):
     def print_synset(self, synset_id: str):
         """
             Fully prints a synset.
+
             Args:
                 synset_id(str): Id of the synset.
+
             Raises:
                 TypeError: If any argument has incorrect type.
                 WordNerError: If there's no synset with the given id in the wordnet.
@@ -322,6 +333,7 @@ class WordNet(object):
         """
             Get the adjacent synsets of a synset with/without type of relations between synsets. You can't retrieve
             the types of relations if you specify a type of relation
+
             Args:
                 synset_id (str): The id of the synset.
                 relation (str): Type of relation we want.
@@ -330,10 +342,12 @@ class WordNet(object):
             Returns:
                 list of Synset: A list of synsets. If show_relations is set to
                 True, returns a tuple of type (synset, relation).
+
             Raises:
                 TypeError: If any argument has incorrect type.
                 WordNerError: If there's no synset with the given id in the wordnet or if argument 'relation' has an
                     incorrect value.
+
         """
 
         if not isinstance(synset_id, str):
@@ -374,10 +388,13 @@ class WordNet(object):
     def synset(self, synset_id: str):
         """
             Get a synset, given its id.
+
             Args:
                 synset_id (str): The id of the synset.
+
             Returns:
                 Synset: The synset with the desired id. If no synset is found, the function will return None.
+
             Raises:
                 TypeError: If any argument has incorrect type.
                 WordNetError: If there's no synset with the given id in the wordnet.
@@ -394,11 +411,14 @@ class WordNet(object):
     def generate_synset_id(self, prefix: str='ENG30-', suffix: str='-n'):
         """
             Generate the first available id that starts with the given prefix and ends with the given suffix.
+
             Args:
                 prefix (str, optional): The desired prefix. Defaults to 'ENG30-'
                 suffix (str, optional): The desired suffix. Defaults to '-n'.
+
             Returns:
                 str: The first available id that starts with the given prefix and ends with the given suffix.
+
             Raises:
                 TypeError: If any argument has incorrect type.
         """
@@ -435,8 +455,10 @@ class WordNet(object):
     def add_synset(self, synset: Synset):
         """
             Add a synset to wordnet.
+
             Args:
                  synset (Synset): The synset to be added.
+
             Raises:
                 TypeError: If any argument has incorrect type.
                 WordNetError: If a synset with the given id is already in the wordnet.
@@ -457,10 +479,12 @@ class WordNet(object):
         """
             Add a new relation to the wordnet. Relation will always be from
             synset_id1 to synset_id2.
+
             Args:
                 synset_id1 (str): Id of the first synset.
                 synset_id2 (str): Id of the second synset.
                 relation(str): Relation type between the synsets.
+
             Raises:
                 TypeError: If any argument has incorrect type.
                 WordNerError: If there's no synset with the given ids in the wordnet, if there's already a relation from
@@ -491,9 +515,11 @@ class WordNet(object):
     def remove_relation(self, synset_id1: str, synset_id2: str):
         """
             Remove a relation between two synsets. Relation is always from the first synset to the second synset.
+
             Args:
                 synset_id1 (str): Id of the first synset.
                 synset_id2 (str): Id of the second synset.
+
             Raises:
                 TypeError: If any argument has incorrect type.
                 WordNerError: If there's no synset with the given ids in the wordnet or if there's no relation from the
@@ -519,10 +545,13 @@ class WordNet(object):
     def synset_to_hypernym_root(self, synset_id: str):
         """
             Get a list containing the path from the given synset to the root in a specified tree.
+
             Args:
                 synset_id (str): Id of the synset.
+
             Returns:
                 list: A list containing synset ids that create the path to the root of the tree.
+
             Raises:
                 TypeError: If any argument has incorrect type.
                 WordNerError: If there's no synset with the given id in the wordnet.
@@ -553,11 +582,14 @@ class WordNet(object):
     def lowest_hypernym_common_ancestor(self, synset_id1: str, synset_id2: str):
         """
             Find the lowest common ancestor of two synsets in a specified tree.
+
             Args:
                 synset_id1 (str): Id of the first synset.
                 synset_id2 (str): Id of the second synset.
+
             Returns:
                 Synset: A synset representing the lowest common ancestor in the specified tree.
+
             Raises:
                 TypeError: If any argument has incorrect type.
                 WordNerError: If there's no synset with the given ids in the wordnet.value.
@@ -575,10 +607,13 @@ class WordNet(object):
     def bfwalk(self, synset_id: str):
         """
             Travel the wordnet starting from a given synset.
+
             Args:
                 synset_id (str): The id of the synset.
+
             Yields:
                 Synset: The next synset in the wordnet.
+
             Raises:
                 TypeError: If any argument has incorrect type.
                 WordNerError: If there's no synset with the given id in the wordnet.
@@ -617,13 +652,16 @@ class WordNet(object):
     def shortest_path(self, synset_id1: str, synset_id2: str, relations: set=None):
         """
             Get the shortest path from the first synset to the second synset.
+
             Args:
                 synset_id1 (str): Id of the first synset.
                 synset_id2 (str): Id of the second synset.
                 relations (list of str): The allowed relations in the shortest path algorithm.
+
             Returns:
                 list of str: A list of synset ids representing the path from
                 the first synset to the second synset.
+
             Raises:
                 TypeError: If any argument has incorrect type.
                 WordNerError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
