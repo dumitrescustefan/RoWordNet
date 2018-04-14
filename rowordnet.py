@@ -1,11 +1,10 @@
 import networkx as nx
 from synset import Synset
 import lxml.etree as et
-from collections import defaultdict
 import pickle
 from queue import Queue
 from exceptions import WordNetError
-
+from collections import defaultdict
 
 class RoWordNet(object):
     def __init__(self, filename=None, empty=False, xml=False):

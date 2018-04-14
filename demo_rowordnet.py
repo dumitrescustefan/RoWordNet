@@ -337,8 +337,10 @@ def demo_create_and_edit_synsets():
 
 
 if __name__ == '__main__':        
-    # rowordnet usage
+    # rowordnet basic usage
     demo_basic_rowordnet_operations()    
+    
+    # rowordnet advanced usage
     demo_get_synonymy_antonymy()
     
     # rowordnet editing
