@@ -31,9 +31,11 @@ As words are polysemous, searching for a word will likely yield more than one sy
 word = 'arbore'
 synset_ids = wn.synsets(literal=word)
 ```
-Eash synset has a unique ID, and most operations work with IDs. Here, ``wn.synsets(word)`` returns a list of synsets that contain word 'arbore' or None if the word is not found.
+Eash synset has a unique ID, and most operations work with IDs. Here, ``wn.synsets(word)`` returns a list of synsets that contain word 'arbore' or an empty list if the word is not found. 
 
-##### Print information about a synset
+Please note that the Romanian WordNet also contains words (literals) that are actually expressions like "tren\_de\_marfă", and searching for "tren" will also find this synset.
+
+##### Get a synset
 
 Calling ``wn.print_synset(id)`` prints all available info of a particular synset.
 
@@ -41,13 +43,14 @@ Calling ``wn.print_synset(id)`` prints all available info of a particular synset
 wn.print_synset(synset_id)
 ```
 
-To get the actual Synset object, we simply call ``wn.synset(id)``:
+To get the actual Synset object, we simply call ``wn.synset(id)``, or ``wn(id)`` directly.
 
 ```python
 synset_object = wn.synset(synset_id)
+synset_object = wn(synset_id) # equivalent, shorter form
 ```
 
-To print any individual information, like its literals, definiton or ID, we simply call its properties:
+To print any individual information, like its literals, definiton or ID, we directly call the synset object's properties:
 
 ```python
 print("Print its literals (synonym words): {}".format(synset_object.literals))
@@ -55,7 +58,7 @@ print("Print its definition: {}".format(synset_object.definition))
 print("Print its ID: {}".format(synset_object.id))
 ```
        
-##### Synset access
+##### Synsets access
     
 The ``wn.synsets()`` function has two (optional) parameters, ``literal`` and ``pos``. If we specify a literal it will return all synset IDs that contain that literal. If we don't specify a literal, we will obtain a list of all existing synsets. The pos parameter filters by part of speech: NOUN, VERB, ADVERB or ADJECTIVE. The function returns a list of synset IDs.
 
@@ -65,9 +68,48 @@ synset_ids_verbs = wn.synsets(pos=Synset.Pos.VERB) # get all verb synset IDs
 synset_ids = wn.synsets(literal="cal", pos=Synset.Pos.NOUN) # get all synset IDs that contain word "cal" and are nouns
 ```
 
+For example we want to list all synsets containing word "cal":
 
-adj_synsets_id = wn.adjacent_synsets(synset_id, relation=relation)
-t.b.d.
+```python
+word = 'cal'
+print("Search for all noun synsets that contain word/literal '{}'".format(word))    
+synset_ids = wn.synsets(literal=word, pos=Synset.Pos.NOUN)
+for synset_id in synset_ids:
+    print(wn.synset(synset_id))
+```
+will output:
+```
+Search for all noun synsets that contain word/literal 'cal'
+Synset(id='ENG30-03624767-n', literals=['cal'], definition='piesă la jocul de șah de forma unui cap de cal')
+Synset(id='ENG30-03538037-n', literals=['cal'], definition='Nume dat unor aparate sau piese asemănătoare cu un cal :')
+Synset(id='ENG30-02376918-n', literals=['cal'], definition='Masculul speciei Equus caballus')
+````
+
+
+##### Relations access
+
+Synsets are linked by relations (encoded as directed edges in a graph). A synset usually has outbound as well as inbound relation, To obtain the outbound relations of a synset use ``wn.outbound_relations()`` with the synset id as parameter. The result is a list of tuples like ``(synset_id, relation)`` encoding the target synset and the relation that starts from the current synset (given as parameter) to the target synset.
+
+```python 
+synset_id = wn.synsets("tren")[2] # select the third synset from all synsets containing word "tren"
+print("\nPrint all outbound relations of {}".format(wn.synset(synset_id)))
+    outbound_relations = wn.outbound_relations(synset_id)
+    for outbound_relation in outbound_relations:
+        target_synset_id = outbound_relation[0]        
+        relation = outbound_relation[1]
+        print("\tRelation [{}] to synset {}".format(relation,wn.synset(target_synset_id)))
+```
+Will output (amongst other relations):
+```   
+Print all outbound relations of Synset(id='ENG30-04468005-n', literals=['tren'], definition='Convoi de vagoane de cale ferată legate între și puse în mișcare de o locomotivă.')
+    Relation [hypernym] to synset Synset(id='ENG30-04019101-n', literals=['transport_public'], definition='transportarea pasagerilor sau postei')
+    Relation [hyponym] to synset Synset(id='ENG30-03394480-n', literals=['marfar', 'tren_de_marfă'], definition='tren format din vagoane de marfă')
+    Relation [member_meronym] to synset Synset(id='ENG30-03684823-n', literals=['locomotivă', 'mașină'], definition='Vehicul motor de cale ferată, cu sursă de energie proprie sau străină, folosind pentru a remorca și a deplasa vagoanele.')
+````
+This means that from the current synset there are three relations pointing to other synsets: the first relation means that "tren" is-a (hypernym) "transport\_public"; the second relation is a hyponym, meaning that "marfar" is-a "tren"; the third member_meronym relation meaning that "locomotiva" is a part-of "tren".
+
+The ``wn.inbound_relations()`` works identically but provides a list of _incoming_ relations to the synset provided as the function parameter, while ``wn.relation()`` provides allboth inbound and outbound relations to/from a synset (note: usually wn.relations() is provided as a convenience and is used for information/printing purposes as the returned tuple list looses directionality)
+              
 
 
 ## Credits
