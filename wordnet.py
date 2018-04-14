@@ -719,7 +719,6 @@ class WordNet(object):
                 shortest_path_list.append(cur_synset_id)
 
             shortest_path_list.reverse()
-
             return shortest_path_list
 
 

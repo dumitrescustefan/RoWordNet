@@ -16,12 +16,10 @@ class Similarity(object):
         """
 
         if not isinstance(wordnet, WordNet):
-            raise TypeError("Argument 'wordnet' has incorrect type, "
-                            "expected Synset, got {}"
+            raise TypeError("Argument 'wordnet' has incorrect type, expected Synset, got {}"
                             .format(type(wordnet).__name__))
         if not isinstance(filename, str):
-            raise TypeError("Argument 'filename' has incorrect type, "
-                            "expected Synset, got {}"
+            raise TypeError("Argument 'filename' has incorrect type, expected Synset, got {}"
                             .format(type(filename).__name__))
 
         self._wordnet = wordnet
@@ -38,13 +36,13 @@ class Similarity(object):
         return len(gloss.intersection(sentence))
 
     def _simplified_lesk(self, literal, sentence):
-        best_sense = None;
+        best_sense = None
         max_overlap = 0
 
         for synset in self._wordnet.synsets(literal):
             overlap = self._overlap_context(synset, sentence)
 
-            for hyponym in wn.adjacent_synsets(synset.id, "hyponym"):
+            for hyponym in self._wordnet.adjacent_synsets(synset.id, "hyponym"):
                 overlap += self._overlap_context(hyponym, sentence)
 
             if overlap > max_overlap:
@@ -59,9 +57,3 @@ class Similarity(object):
                 best_sense  = self._simplified_lesk(word, sentence)
                 print(best_sense)
 
-if __name__ == "__main__":
-    wn = WordNet()
-    corpus = "resources/corpus.txt"
-
-    sim = Similarity(wn, corpus)
-    sim.lesk()
