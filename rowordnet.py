@@ -48,17 +48,17 @@ class RoWordNet(object):
         self._graph = nx.DiGraph()
         self._synsets = {}
         self._literal2synset = defaultdict(list)
-        self._relations_type = set()
+        self._relation_types = set()
 
     @property
-    def relations_type(self):
+    def relation_types(self):
         """
-            Gets all types of possible relations between synsets.
+            Gets a set of all relation types existing in RoWordNet.
             Returns:
-                list of str: A list containing all types of possible relations between synsets.
+                set of str: A set containing all types of existing relations between synsets.
         """
 
-        return self._relations_type
+        return self._relation_types
 
     def save(self, filename: str, xml: bool = False):
         """
@@ -139,7 +139,7 @@ class RoWordNet(object):
                     synset.stamp = element.text
 
                 if element.tag == 'ILR':
-                    self._relations_type.add(element[0].text)
+                    self._relation_types.add(element[0].text)
 
                     self._graph.add_edge(synset.id, element.text,
                                          label=element[0].text)
@@ -172,7 +172,7 @@ class RoWordNet(object):
 
         self._clean()
 
-        self._relations_type = wn.relations_type
+        self._relation_types = wn.relation_types
 
         synsets_id = wn.synsets()
 
@@ -352,6 +352,9 @@ class RoWordNet(object):
     def relations(self, synset_id: str):
         return self.outbound_relations(synset_id) + self.inbound_relations(synset_id)
 
+    def __call__(self, synset_id: str):
+        return self.synset(synset_id)
+        
     def synset(self, synset_id: str):
         """
             Get a synset, given its id.
@@ -461,7 +464,7 @@ class RoWordNet(object):
             raise WordNetError("Synset with id '{}' is not in the wordnet".format(synset_id1))
         if synset_id2 not in self._synsets:
             raise WordNetError("Synset with id '{}' is not in the wordnet".format(synset_id2))
-        if relation not in self._relations_type:
+        if relation not in self._relation_types:
             raise WordNetError("Relation '{}' is not a correct relation".format(relation))
         if self._graph.has_edge(synset_id1, synset_id2):
             raise WordNetError("There's already a relation from the synset with id '{}' to the synset with id '{}'"
@@ -633,7 +636,7 @@ class RoWordNet(object):
                 if not isinstance(relation, str):
                     raise TypeError("Argument 'relation - relations' has incorrect type, expected str, got {}"
                                     .format(type(relation).__name__))
-                if relation not in self._relations_type:
+                if relation not in self._relation_types:
                     raise WordNetError("Relation '{}' is not a correct relation".format(relation))
 
             queue = Queue()

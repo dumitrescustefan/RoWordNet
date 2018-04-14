@@ -5,7 +5,9 @@ from synset import Synset
 def demo_basic_rowordnet_operations():
     print("\n\nThis demo shows the basic components and operations of the RoWordNet.\n"+"_"*70)
     # load rowordnet from internal resources
-    wn = rowordnet.RoWordNet()
+    wn = rowordnet.RoWordNet("resources/xml_wn.xml", xml=True)
+   
+    wn.save("resources/binary_wn.pck")
     
     # RoWordNet is composed of synsets linked together by semantic relations
     
@@ -21,9 +23,14 @@ def demo_basic_rowordnet_operations():
     wn.print_synset(synset_id)
     
     # get the object itself
-    print("\n\tGet the object itself by its id = {}".format(synset_id))
+    print("\n\tGet the object itself by its id = {}, calling wn.synset():".format(synset_id))
     synset_object = wn.synset(synset_id)
-    print(synset_object)
+    print("\t\t"+str(synset_object))
+    
+    print("\n\tGet the object itself by its id = {}, calling wn() directly:".format(synset_id))
+    synset_object = wn(synset_id)
+    print("\t\t"+str(synset_object))
+    
     
     # print its literals, definition and id
     print("\n\tPrint its literals (synonym words): {}".format(synset_object.literals))
@@ -36,7 +43,7 @@ def demo_basic_rowordnet_operations():
     # example of iterating through synsets
     for synset_id in synsets_id:
         # get the synsets objects from the rowordnet by their IDs
-        synset_object = wn.synset(synset_id)
+        synset_object = wn(synset_id)
         # do something with the object
         pass
 
@@ -57,11 +64,13 @@ def demo_basic_rowordnet_operations():
     # search for a word(here knows as a literal) in all noun synsets
     word = 'cal'
     print("\tSearch for all noun synsets that contain word/literal '{}'".format(word))    
-    synsets_id = wn.synsets(literal=word, pos=Synset.Pos.NOUN)
-    print("\t\tTotal number of noun synsets containing word/literal '{}': {}".format(word, len(synsets_id)))
+    synset_ids = wn.synsets(literal=word, pos=Synset.Pos.NOUN)
+    print("\t\tTotal number of noun synsets containing word/literal '{}' is {}, listed below:".format(word, len(synset_ids)))
+    for synset_id in synset_ids:
+        print("\t\t"+str(wn(synset_id)))
    
     # we continue with examples of navigating in the Wordnet 
-    print("\n\tExamples of navigating the Wordnet:")
+    print("\n\tExamples of navigating the wordnet:")
     
     # get a synset
     synset_id = wn.synsets()[0]
@@ -69,16 +78,23 @@ def demo_basic_rowordnet_operations():
     print("\tList of synset ids from synset with id '{}' up to its root in the hypermyn tree: ".format(synset_id))
     print("\t\t{}".format(wn.synset_to_hypernym_root(synset_id)))
 
-    # get the inbound relations of a synset
-    synset_id = wn.synsets()[0]
-    inbound_relations = wn.inbound_relations(synset_id)
-    print("\n\tThe first inbound relation of the synset with id '{}': {}".format(synset_id, inbound_relations[0]))
-    # get the outbound reations of the same synset
+    # print all outbound relations of a synset
+    synset_id = wn.synsets("tren")[2]
+    print("\n\tPrint all outbound relations of {}".format(wn(synset_id)))
     outbound_relations = wn.outbound_relations(synset_id)
-    print("\tThe first outbound relation of the synset with id '{}': {}".format(synset_id, outbound_relations[0]))
+    for outbound_relation in outbound_relations:
+        target_synset_id = outbound_relation[0]        
+        relation = outbound_relation[1]
+        print("\t\tRelation [{}] to synset {}".format(relation,wn(target_synset_id)))
+        
+    # print all inbound relations of a synset, short syntax
+    print("\n\tPrint all outbound relations of {}".format(wn(synset_id)))    
+    for source_synset_id, relation in wn.inbound_relations(synset_id):
+        print("\t\tRelation [{}] from synset {}".format(relation,wn(source_synset_id)))
+        
     # get all relations of the same synset
     relations = wn.relations(synset_id)
-    print("\tThe first relation of the synset with id '{}': {}".format(synset_id, relations[0]))
+    print("\tThe synset has {} total relations.".format(len(relations)))
 
     # get the shortest path between two synsets
     synset1_id = wn.synsets("cal")[2]
@@ -107,9 +123,13 @@ def demo_basic_rowordnet_operations():
     synset1_id = wn.synsets("cal")[2]
     synset2_id = wn.synsets("iepure")[0]
     synset_id = wn.lowest_hypernym_common_ancestor(synset1_id, synset2_id)
-    print("\n\tThe lowest common ancestor in the hypernym tree of synset '{}' and synset '{}' is '{}':"
-          .format(synset1_id, synset2_id, synset_id))
-
+    print("\n\tThe lowest common ancestor in the hypernym tree of synset: \n\t\t{} \n\t\t  and \n\t\t{} \n\t\t  is \n\t\t{}"
+          .format(wn(synset1_id), wn(synset2_id), wn(synset_id)))
+          
+    # print all relation types existing in RoWordNet
+    print("\n\tList all relation types existing in RoWordNet:")
+    for relation in wn.relation_types: # this is a property
+        print ("\t\t{}".format(relation))
 
 def demo_get_synonymy_antonymy():
     import itertools
@@ -131,7 +151,7 @@ def demo_get_synonymy_antonymy():
     for synset_id in synsets_id:
         # the literals object is a dict, but we need only the
         # actual literals (not senses)
-        synset = wn.synset(synset_id)
+        synset = wn(synset_id)
         literals = list(synset.literals)
         for i in range(len(literals)):
             for j in range(i+1, len(literals)):
@@ -154,14 +174,14 @@ def demo_get_synonymy_antonymy():
 
     synsets_id = wn.synsets()  # extract all synsets
     for synset_id in synsets_id:
-        synset = wn.synset(synset_id)
+        synset = wn(synset_id)
         # extract the antonyms of a synset
         synset_outbound_id = wn.outbound_relations(synset.id)
         synset_antonyms_id = [synset_tuple[0] for synset_tuple in synset_outbound_id
                               if synset_tuple[1] == 'near_antonym']
 
         for synset_antonym_id in synset_antonyms_id:  # for each antonym synset
-            synset_antonym = wn.synset(synset_antonym_id)
+            synset_antonym = wn(synset_antonym_id)
             # if the antonymy pair doesn't already exists
             if (synset_antonym, synset) not in synset_pairs:
                 # add the antonym tuple to the list
@@ -308,7 +328,7 @@ def demo_create_and_edit_synsets():
     sense = '1'
     # get a synset
     synset_id = wn.synsets()[0]
-    synset = wn.synset(synset_id)
+    synset = wn(synset_id)
     # add a literal to the synset
     synset.add_literal(literal, sense)
     # tell the rowordnet that synsets's literals have been changed. This step is
