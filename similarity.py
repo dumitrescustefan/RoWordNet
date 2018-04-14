@@ -15,7 +15,7 @@ class Similarity(object):
                 TypeError: If any argument has incorrect type.
         """
 
-        if not isinstance(wordnet, WordNet):
+        if not isinstance(wordnet, RoWordNet):
             raise TypeError("Argument 'wordnet' has incorrect type, expected Synset, got {}"
                             .format(type(wordnet).__name__))
         if not isinstance(filename, str):
