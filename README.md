@@ -1,6 +1,6 @@
 # RoWordNet
 
-**RoWordNet stand for Romanian WordNet, a semantic network for the Romanian language**. RoWordNet mimics Princeton's WordNet, a large lexical database of English. 
+**RoWordNet stand for Romanian WordNet, a semantic network for the Romanian language**. RoWordNet mimics Princeton WordNet, a large lexical database of English. 
 The building block of a WordNet is the **synset** that expresses a unique concept. The synset (a synonym set) contains, as the name implies, a number of synonym words known as literals. The synset has more properties like a definition and links to other synsets. They also have a part-of-speech (pos) that groups them in four categories: nouns, verbs, adverbs and adjectives. Synsets are interlinked by **semantic relations** like hypernymy ("is-a"), meronymy ("is-part"), antonymy, and others. 
 
 ## Install

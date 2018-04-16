@@ -159,7 +159,7 @@ def demo_get_synonymy_antonymy():
     # list a few synonyms
     print("\n\tList of the first 5 synonyms: ({} total synonym pairs extracted)".format(len(synonyms)))
     for i in range(5):
-        print("\t\t {:>20} == {}".format(synonyms[i][0], synonyms[i][1]))
+        print("\t\t {:>25} == {}".format(synonyms[i][0], synonyms[i][1]))
 
     # now, antonyms
     antonyms = []
@@ -204,7 +204,7 @@ def demo_get_synonymy_antonymy():
     # list a few antonyms
     print("\n\tList of the first 5 antonyms: ({} total antonym pairs extracted)".format(len(antonyms)))
     for i in range(5):
-        print("\t\t {:>20} != {}".format(antonyms[i][0], antonyms[i][1]))
+        print("\t\t {:>25} != {}".format(antonyms[i][0], antonyms[i][1]))
 
 
 def demo_load_and_save_rowordnet():
