@@ -14,7 +14,7 @@ pip install rowordnet
 
 ```python
 import rowordnet
-wn = rowordnet.wordnet()
+wn = rowordnet.rowordnet()
 ```
 
 For a demo on basic ops please see the Jupyter notebook here.
@@ -24,7 +24,7 @@ For a demo on RoWordNet synset/relation creation and editing please see the Jupy
 
 We present a few basic usage examples here:
 
-##### Search for a word
+#### Search for a word
 
 As words are polysemous, searching for a word will likely yield more than one synset. A word is known as a literal in RoWordNet, and every synset has one or more literals that are synonyms.
 ```python
@@ -35,7 +35,7 @@ Eash synset has a unique ID, and most operations work with IDs. Here, ``wn.synse
 
 Please note that the Romanian WordNet also contains words (literals) that are actually expressions like "tren\_de\_marfă", and searching for "tren" will also find this synset.
 
-##### Get a synset
+#### Get a synset
 
 Calling ``wn.print_synset(id)`` prints all available info of a particular synset.
 
@@ -58,7 +58,7 @@ print("Print its definition: {}".format(synset_object.definition))
 print("Print its ID: {}".format(synset_object.id))
 ```
        
-##### Synsets access
+#### Synsets access
     
 The ``wn.synsets()`` function has two (optional) parameters, ``literal`` and ``pos``. If we specify a literal it will return all synset IDs that contain that literal. If we don't specify a literal, we will obtain a list of all existing synsets. The pos parameter filters by part of speech: NOUN, VERB, ADVERB or ADJECTIVE. The function returns a list of synset IDs.
 
@@ -86,7 +86,7 @@ Synset(id='ENG30-02376918-n', literals=['cal'], definition='Masculul speciei Equ
 ````
 
 
-##### Relations access
+#### Relations access
 
 Synsets are linked by relations (encoded as directed edges in a graph). A synset usually has outbound as well as inbound relation, To obtain the outbound relations of a synset use ``wn.outbound_relations()`` with the synset id as parameter. The result is a list of tuples like ``(synset_id, relation)`` encoding the target synset and the relation that starts from the current synset (given as parameter) to the target synset.
 
