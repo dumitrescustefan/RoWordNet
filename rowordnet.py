@@ -36,7 +36,7 @@ class RoWordNet(object):
             return
 
         if filename is None:
-            self._load_from_binary("resources/binary_wn.pck")
+            self._load_from_binary("rowordnet.pickle")
             return
 
         if xml is True:

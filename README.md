@@ -10,21 +10,39 @@ Simple, use python's pip:
 pip install rowordnet
 ```
 
-## Use
+RoWordNet has two dependencies: _networkx_ and _lxml_ which are automatically installed by pip.
+
+## Intro
+
+RoWordNet is, at its core, a directed graph (powered by networkx) with synset IDs as nodes and relations as edges. Synsets (objects) are kept as an ID:object indexed dictionary for O(1) access.
+
+A **synset** has the following data, accessed as properties (others are present, but the following are most important): 
+* id : the id(string) of this synset
+* literals : a list of words(strings) representing a unique concept. These words are synonyms.
+* definition : a longer description(string) of this synset
+* pos : the part of speech of this synset (enum: Synset.Pos.NOUN, VERB, ADVERB, ADJECTIVE)
+* sentiwn : a three-valued list indicating the SentiWN PNO (Positive, Negative, Objective) of this synset.
+
+**Relations** are edges between synsets. Examples on how to list inbound/outbound relations given a synset and other graph operations are given in examples below.
+
+____
+
+* Demo on basic ops available as a [Jupyter notebook here](http://www.google.com).
+* Demo on more advanced ops available as a [Jupyter notebook here](http://www.google.com).
+* Demo on save/load ops available as a [Jupyter notebook here](http://www.google.com).
+* Demo on synset/relation creation and editing available as a [Jupyter notebook here](http://www.google.com).
+____
+
+## Basic Usage
 
 ```python
 import rowordnet
-wn = rowordnet.wordnet()
+wn = rowordnet.rowordnet()
 ```
 
-For a demo on basic ops please see the Jupyter notebook here.
-For a demo on more advanced ops please see the Jupyter notebook here.
-For a demo on RoWordNet save/load ops please see the Jupyter notebook here.
-For a demo on RoWordNet synset/relation creation and editing please see the Jupyter notebook here.
+And you're good to go. We present a few basic usage examples here:
 
-We present a few basic usage examples here:
-
-##### Search for a word
+### Search for a word
 
 As words are polysemous, searching for a word will likely yield more than one synset. A word is known as a literal in RoWordNet, and every synset has one or more literals that are synonyms.
 ```python
@@ -35,7 +53,7 @@ Eash synset has a unique ID, and most operations work with IDs. Here, ``wn.synse
 
 Please note that the Romanian WordNet also contains words (literals) that are actually expressions like "tren\_de\_marfă", and searching for "tren" will also find this synset.
 
-##### Get a synset
+### Get a synset
 
 Calling ``wn.print_synset(id)`` prints all available info of a particular synset.
 
@@ -58,7 +76,7 @@ print("Print its definition: {}".format(synset_object.definition))
 print("Print its ID: {}".format(synset_object.id))
 ```
        
-##### Synsets access
+### Synsets access
     
 The ``wn.synsets()`` function has two (optional) parameters, ``literal`` and ``pos``. If we specify a literal it will return all synset IDs that contain that literal. If we don't specify a literal, we will obtain a list of all existing synsets. The pos parameter filters by part of speech: NOUN, VERB, ADVERB or ADJECTIVE. The function returns a list of synset IDs.
 
@@ -86,7 +104,7 @@ Synset(id='ENG30-02376918-n', literals=['cal'], definition='Masculul speciei Equ
 ````
 
 
-##### Relations access
+### Relations access
 
 Synsets are linked by relations (encoded as directed edges in a graph). A synset usually has outbound as well as inbound relation, To obtain the outbound relations of a synset use ``wn.outbound_relations()`` with the synset id as parameter. The result is a list of tuples like ``(synset_id, relation)`` encoding the target synset and the relation that starts from the current synset (given as parameter) to the target synset.
 
@@ -114,3 +132,13 @@ The ``wn.inbound_relations()`` works identically but provides a list of _incomin
 
 ## Credits
 
+If you decide to use this work in a scientific paper, please consider citing the following paper as a thank you to the authors of the actual Romanian WordNet data:
+
+```
+Dan Tufiş, Verginica Barbu Mititelu, The Lexical Ontology for Romanian, in Nuria Gala, Reinhard Rapp, Nuria Bel-Enguix (Ed.), Language Production, Cognition, and the Lexicon, series Text, Speech and Language Technology, vol. 48, Springer, 2014, p. 491-504.
+```
+or in .bib format:
+
+```
+@InBook{DTVBMzock,title = "The Lexical Ontology for Romanian",author = "Tufiș, Dan and Barbu Mititelu, Verginica",booktitle = "Language Production, Cognition, and the Lexicon",editor = "Nuria Gala, Reinhard Rapp, Nuria Bel-Enguix",series = "Text, Speech and Language Technology",volume = "48",year = "2014",publisher = "Springer",pages = "491-504"}
+``

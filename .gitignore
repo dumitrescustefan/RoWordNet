@@ -3,6 +3,8 @@ __pycache__/
 /.idea/
 .idea/
 
+#*.xml
+
 # Folder config file
 [Dd]esktop.ini
 /**/[Dd]esktop.ini

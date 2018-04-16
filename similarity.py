@@ -57,4 +57,3 @@ class Similarity(object):
             for word in sentence:
                 best_sense = self._simplified_lesk(word, sentence)
                 print(best_sense)
-
