@@ -129,11 +129,25 @@ class RoWordNet(object):
                     synset.pos = pos
 
                 if element.tag == 'SYNONYM':
-                    synset.literals = [literal.text for literal in element]
+                    try:
+                        synset.literals = [literal.text for literal in element]
+                    except TypeError as e:
+                        print(synset.id)
+
+                    literals_senses = []
                     for literal in element:
-                        synset.literals_senses.append(literal[0].text if literal is not None else "")
-                    for literal in element:
-                        self._literal2synset[literal.text].append(synset.id)
+                        literals_senses.append(literal[0].text if literal[0].text is not None else "")
+                    synset.literals_senses = literals_senses
+
+                    for literal in synset.literals:
+                        literal_parts = literal.split('_')
+                        if len(literal_parts) > 1:
+                            for literal_part in literal_parts:
+                                if literal_part not in synset.literals:
+                                    synset.add_literal(literal_part)
+
+                    for literal in synset.literals:
+                        self._literal2synset[literal].append(synset.id)
 
                 if element.tag == 'STAMP':
                     synset.stamp = element.text
@@ -276,8 +290,10 @@ class RoWordNet(object):
     def print_synset(self, synset_id: str):
         """
             Fully prints a synset.
+
             Args:
                 synset_id(str): Id of the synset.
+
             Raises:
                 TypeError: If any argument has incorrect type.
                 WordNerError: If there's no synset with the given id in the wordnet.
@@ -291,22 +307,32 @@ class RoWordNet(object):
 
         synset = self.synset(synset_id)
 
-        output = "Synset(id={!r}, pos={!r}, nonlexicalized={!r}, stamp={!r}, domain={!r}\n\t  definition={!r}" \
-                 "\n\t  sumo={!r}, sumoType={!r}, sentiwn={!r})". \
-            format(synset.id, synset.pos, synset.nonlexicalized, synset.stamp, synset.domain, synset.definition,
-                   synset.sumo, synset.sumotype, synset.sentiwn)
+        print("Synset: "
+              "\n\t  id={}"
+              "\n\t  pos={!r}"
+              "\n\t  nonlexicalized={}"
+              "\n\t  stamp={}"
+              "\n\t  domain={}"
+              "\n\t  definition={}" 
+              "\n\t  sumo={} "
+              "\n\t  sumoType={!r}"
+              "\n\t  sentiwn={}".
+              format(synset.id, synset.pos, synset.nonlexicalized, synset.stamp, synset.domain, synset.definition,
+                     synset.sumo, synset.sumotype, synset.sentiwn))
 
-        output += "\n\t  Literals:"
+        print("\t  Literals:")
         for i in range(len(synset.literals)):
-            output += "\n\t\t  {!r}:{!r}".format(synset.literals[i], synset.literals_senses[i])
+            print("\t\t  {} - {}".format(synset.literals[i], synset.literals_senses[i]))
 
-        output += "\n"
+        outbound_relations = self.outbound_relations(synset_id)
+        print("\t  Outbound relations: ")
+        for synset_id, relation in outbound_relations:
+            print("\t\t  {} - {}".format(synset_id, relation))
 
-        adj_synsets_id = list(self._graph.adj[synset_id].keys())
-        output += "\t  Adjacent synsets: "
-        output += str(adj_synsets_id)
-
-        print(output)
+        inbound_relations = self.inbound_relations(synset_id)
+        print("\t  Inbound relations: ")
+        for synset_id, relation in inbound_relations:
+            print("\t\t  {} - {}".format(synset_id, relation))
 
     def reindex_literals(self):
         """
@@ -353,6 +379,12 @@ class RoWordNet(object):
         return self.outbound_relations(synset_id) + self.inbound_relations(synset_id)
 
     def __call__(self, synset_id: str):
+        if not isinstance(synset_id, str):
+            raise TypeError("Argument 'synset_id' has incorrect type, expected str, got {}"
+                            .format(type(synset_id).__name__))
+        if synset_id not in self._synsets:
+            raise WordNetError("Synset with id '{}' is not in the wordnet".format(synset_id))
+
         return self.synset(synset_id)
         
     def synset(self, synset_id: str):
@@ -541,7 +573,7 @@ class RoWordNet(object):
                 synset_id1 (str): Id of the first synset.
                 synset_id2 (str): Id of the second synset.
             Returns:
-                Synset: A synset representing the lowest common ancestor in the specified tree.
+                str: A synset representing the lowest common ancestor in the specified tree.
             Raises:
                 TypeError: If any argument has incorrect type.
                 WordNerError: If there's no synset with the given ids in the wordnet.value.
