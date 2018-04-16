@@ -127,7 +127,8 @@ def demo_basic_rowordnet_operations():
     # print all relation types existing in RoWordNet
     print("\n\tList all relation types existing in RoWordNet:")
     for relation in wn.relation_types: # this is a property
-        print ("\t\t{}".format(relation))
+        print("\t\t{}".format(relation))
+
 
 def demo_get_synonymy_antonymy():
     import itertools
