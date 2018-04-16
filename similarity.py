@@ -42,8 +42,9 @@ class Similarity(object):
         for synset in self._wordnet.synsets(literal):
             overlap = self._overlap_context(synset, sentence)
 
-            for hyponym in self._wordnet.adjacent_synsets(synset.id, "hyponym"):
-                overlap += self._overlap_context(hyponym, sentence)
+            for synset_id, relation in self._wordnet.outbound_relations(synset.id):
+                if relation == 'hypernym':
+                    overlap += self._overlap_context(synset_id, sentence)
 
             if overlap > max_overlap:
                 max_overlap = overlap
@@ -54,6 +55,6 @@ class Similarity(object):
     def lesk(self):
         for sentence in self._lemmas:
             for word in sentence:
-                best_sense  = self._simplified_lesk(word, sentence)
+                best_sense = self._simplified_lesk(word, sentence)
                 print(best_sense)
 

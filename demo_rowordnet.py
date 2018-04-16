@@ -30,8 +30,7 @@ def demo_basic_rowordnet_operations():
     print("\n\tGet the object itself by its id = {}, calling wn() directly:".format(synset_id))
     synset_object = wn(synset_id)
     print("\t\t"+str(synset_object))
-    
-    
+
     # print its literals, definition and id
     print("\n\tPrint its literals (synonym words): {}".format(synset_object.literals))
     print("\tPrint its definition: {}".format(synset_object.definition))
@@ -65,7 +64,8 @@ def demo_basic_rowordnet_operations():
     word = 'cal'
     print("\tSearch for all noun synsets that contain word/literal '{}'".format(word))    
     synset_ids = wn.synsets(literal=word, pos=Synset.Pos.NOUN)
-    print("\t\tTotal number of noun synsets containing word/literal '{}' is {}, listed below:".format(word, len(synset_ids)))
+    print("\t\tTotal number of noun synsets containing word/literal '{}' is {}, listed below:"
+          .format(word, len(synset_ids)))
     for synset_id in synset_ids:
         print("\t\t"+str(wn(synset_id)))
    
@@ -123,13 +123,15 @@ def demo_basic_rowordnet_operations():
     synset1_id = wn.synsets("cal")[2]
     synset2_id = wn.synsets("iepure")[0]
     synset_id = wn.lowest_hypernym_common_ancestor(synset1_id, synset2_id)
-    print("\n\tThe lowest common ancestor in the hypernym tree of synset: \n\t\t{} \n\t\t  and \n\t\t{} \n\t\t  is \n\t\t{}"
+    print("\n\tThe lowest common ancestor in the hypernym tree of synset: "
+          "\n\t\t{} \n\t\t  and \n\t\t{} \n\t\t  is \n\t\t{}"
           .format(wn(synset1_id), wn(synset2_id), wn(synset_id)))
           
     # print all relation types existing in RoWordNet
     print("\n\tList all relation types existing in RoWordNet:")
     for relation in wn.relation_types: # this is a property
-        print ("\t\t{}".format(relation))
+        print("\t\t{}".format(relation))
+
 
 def demo_get_synonymy_antonymy():
     import itertools
