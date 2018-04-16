@@ -29,7 +29,6 @@ def demo_basic_rowordnet_operations():
     synset_object = wn(synset_id)
     print("\t\t"+str(synset_object))
     
-    
     # print its literals, definition and id
     print("\n\tPrint its literals (synonym words): {}".format(synset_object.literals))
     print("\tPrint its definition: {}".format(synset_object.definition))
@@ -83,12 +82,12 @@ def demo_basic_rowordnet_operations():
     for outbound_relation in outbound_relations:
         target_synset_id = outbound_relation[0]        
         relation = outbound_relation[1]
-        print("\t\tRelation [{}] to synset {}".format(relation,wn(target_synset_id)))
+        print("\t\tRelation [{}] to synset {}".format(relation, wn(target_synset_id)))
         
     # print all inbound relations of a synset, short syntax
     print("\n\tPrint all outbound relations of {}".format(wn(synset_id)))    
     for source_synset_id, relation in wn.inbound_relations(synset_id):
-        print("\t\tRelation [{}] from synset {}".format(relation,wn(source_synset_id)))
+        print("\t\tRelation [{}] from synset {}".format(relation, wn(source_synset_id)))
         
     # get all relations of the same synset
     relations = wn.relations(synset_id)
@@ -133,7 +132,7 @@ def demo_basic_rowordnet_operations():
 def demo_get_synonymy_antonymy():
     import itertools
 
-    print("\n\nThis demo shows how a bit more advanced series of ops.\n" + "_" * 70)
+    print("\n\nThis demo shows a bit more advanced series of ops.\n" + "_" * 70)
 
     # load from binary wordnet
     wn = rowordnet.RoWordNet()
