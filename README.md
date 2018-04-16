@@ -132,7 +132,7 @@ The ``wn.inbound_relations()`` works identically but provides a list of _incomin
 
 ## Credits
 
-If you decide to use this work in a scientific paper, please consider citing the following paper as a thank you to the authors of the actual Romanian WordNet data:
+If you decide to use this work in a scientific paper, please consider citing the following as a thank you to the authors of the actual Romanian WordNet data:
 
 ```
 Dan Tufiş, Verginica Barbu Mititelu, The Lexical Ontology for Romanian, in Nuria Gala, Reinhard Rapp, Nuria Bel-Enguix (Ed.), Language Production, Cognition, and the Lexicon, series Text, Speech and Language Technology, vol. 48, Springer, 2014, p. 491-504.
@@ -141,4 +141,4 @@ or in .bib format:
 
 ```
 @InBook{DTVBMzock,title = "The Lexical Ontology for Romanian",author = "Tufiș, Dan and Barbu Mititelu, Verginica",booktitle = "Language Production, Cognition, and the Lexicon",editor = "Nuria Gala, Reinhard Rapp, Nuria Bel-Enguix",series = "Text, Speech and Language Technology",volume = "48",year = "2014",publisher = "Springer",pages = "491-504"}
-``
+```
