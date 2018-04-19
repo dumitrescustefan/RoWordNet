@@ -126,7 +126,7 @@ Print all outbound relations of Synset(id='ENG30-04468005-n', literals=['tren'],
 ````
 This means that from the current synset there are three relations pointing to other synsets: the first relation means that "tren" is-a (hypernym) "transport\_public"; the second relation is a hyponym, meaning that "marfar" is-a "tren"; the third member_meronym relation meaning that "locomotiva" is a part-of "tren".
 
-The ``wn.inbound_relations()`` works identically but provides a list of _incoming_ relations to the synset provided as the function parameter, while ``wn.relation()`` provides allboth inbound and outbound relations to/from a synset (note: usually wn.relations() is provided as a convenience and is used for information/printing purposes as the returned tuple list looses directionality)
+The ``wn.inbound_relations()`` works identically but provides a list of _incoming_ relations to the synset provided as the function parameter, while ``wn.relations()`` provides allboth inbound and outbound relations to/from a synset (note: usually wn.relations() is provided as a convenience and is used for information/printing purposes as the returned tuple list looses directionality)
               
 
 
