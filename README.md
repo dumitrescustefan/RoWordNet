@@ -141,4 +141,4 @@ or in .bib format:
 
 ```
 @InBook{DTVBMzock,title = "The Lexical Ontology for Romanian",author = "Tufiș, Dan and Barbu Mititelu, Verginica",booktitle = "Language Production, Cognition, and the Lexicon",editor = "Nuria Gala, Reinhard Rapp, Nuria Bel-Enguix",series = "Text, Speech and Language Technology",volume = "48",year = "2014",publisher = "Springer",pages = "491-504"}
-``
+```
