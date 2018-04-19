@@ -27,10 +27,10 @@ A **synset** has the following data, accessed as properties (others are present,
 
 ____
 
-* Demo on basic ops available as a [Jupyter notebook here](http://www.google.com).
-* Demo on more advanced ops available as a [Jupyter notebook here](http://www.google.com).
-* Demo on save/load ops available as a [Jupyter notebook here](http://www.google.com).
-* Demo on synset/relation creation and editing available as a [Jupyter notebook here](http://www.google.com).
+* Demo on basic ops available as a [Jupyter notebook here](jupyter/basic_operations_wordnet.ipynb).
+* Demo on more advanced ops available as a [Jupyter notebook here](jupyter/ 	create_edit_synsets.ipynb).
+* Demo on save/load ops available as a [Jupyter notebook here](jupyter/load_save_wordnet.ipynb).
+* Demo on synset/relation creation and editing available as a [Jupyter notebook here](jupyter/synonym_antonym.ipynb).
 ____
 
 ## Basic Usage
