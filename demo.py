@@ -1,5 +1,6 @@
 import rowordnet
 from synset import Synset
+from rowordnet import intersection, merge, difference
 
 
 def demo_basic_rowordnet_operations():
@@ -120,7 +121,8 @@ def demo_basic_rowordnet_operations():
     synset1_id = wn.synsets("cal")[2]
     synset2_id = wn.synsets("iepure")[0]
     synset_id = wn.lowest_hypernym_common_ancestor(synset1_id, synset2_id)
-    print("\n\tThe lowest common ancestor in the hypernym tree of synset: \n\t\t{} \n\t\t  and \n\t\t{} \n\t\t  is \n\t\t{}"
+    print("\n\tThe lowest common ancestor in the hypernym tree of synset: "
+          "\n\t\t{} \n\t\t  and \n\t\t{} \n\t\t  is \n\t\t{}"
           .format(wn(synset1_id), wn(synset2_id), wn(synset_id)))
           
     # print all relation types existing in RoWordNet
@@ -364,16 +366,51 @@ def demo_create_and_edit_synsets():
     print("\tRemoved relation from synset with id '{}' to synset with id '{}'".format(synset.id, new_synset.id))
 
 
+def demo_operations_rowordnet():
+    wn1 = rowordnet.RoWordNet()
+    wn2 = rowordnet.RoWordNet()
+
+    # add a new synset to the second wordnet
+    new_synset_id = wn1.generate_synset_id()
+    new_synset = Synset(new_synset_id)
+    wn2.add_synset(new_synset)
+
+    # modify a synset in the second wordnet
+    synset_id = wn2.synsets("cal")[0]
+    synset = wn2.synset(synset_id)
+    synset.definition = "Definitie noua"
+
+    # add a new relation in the second wordnet
+    wn2.add_relation(new_synset_id, synset_id, "hypernym")
+
+    # intersect two wordnets
+    intersection_wn = intersection(wn1, wn2)
+    print("Number of synsets in the intersect wordnet: {}\n".format(len(intersection_wn.synsets())))
+
+    # merge two wordnets
+    union_wn = merge(wn1, wn2)
+    print("Numer of synsets in the union wordnet: {}\n".format(len(union_wn.synsets())))
+
+    # different synsets/relations in the second wordnet
+    diff_synsets, diff_relations = difference(wn1, wn2)
+    print("Synsets that exists only in the second wordnet or that exists in both wordnets but are modified: {}"
+          .format(diff_synsets))
+    print("Relations that exists only in the second wordnet: {}".format(diff_relations))
+
+
 if __name__ == '__main__':
-    #rowordnet basic usage
-    demo_basic_rowordnet_operations()
+    # rowordnet basic usage
+    #demo_basic_rowordnet_operations()
     
     # rowordnet advanced usage
-    demo_get_synonymy_antonymy()
+    #demo_get_synonymy_antonymy()
     
     # rowordnet editing
-    demo_load_and_save_rowordnet()
-    demo_create_and_edit_synsets()
+    #demo_load_and_save_rowordnet()
+    #demo_create_and_edit_synsets()
+
+    # rowordnet operations
+    demo_operations_rowordnet()
     
 
 
