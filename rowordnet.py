@@ -334,6 +334,19 @@ class RoWordNet(object):
         for synset_id, relation in inbound_relations:
             print("\t\t  {} - {}".format(synset_id, relation))
 
+    def synset_exists(self, synset: Synset):
+        if not isinstance(synset, Synset):
+            raise TypeError("Argument 'synset' has incorrect type, expected Synset, got {}"
+                            .format(type(synset).__name__))
+        if synset.id not in self._synsets.keys():
+            return False
+
+        current_synset = self._synsets[synset.id]
+        if current_synset != synset:
+            return False
+
+        return True
+
     def reindex_literals(self):
         """
             Reindex all literals to the synsets. This is used if the literals of a synset have been changed.
@@ -377,6 +390,38 @@ class RoWordNet(object):
 
     def relations(self, synset_id: str):
         return self.outbound_relations(synset_id) + self.inbound_relations(synset_id)
+
+    def relation_exists(self, synset_id1: str, synset_id2: str, relation: str):
+        if not isinstance(synset_id1, str):
+            raise TypeError("Argument 'synset_id1' has incorrect type, expected str, got {}"
+                            .format(type(synset_id1).__name__))
+        if not isinstance(synset_id2, str):
+            raise TypeError("Argument 'synset_id2' has incorrect type, expected str, got {}"
+                            .format(type(synset_id2).__name__))
+        if not isinstance(relation, str):
+            raise TypeError("Argument 'relation' has incorrect type, expected str, got {}"
+                            .format(type(relation).__name__))
+        if synset_id1 not in self._synsets:
+            raise WordNetError("Synset with id '{}' is not in the wordnet".format(synset_id1))
+        if synset_id2 not in self._synsets:
+            raise WordNetError("Synset with id '{}' is not in the wordnet".format(synset_id2))
+        if relation not in self._relation_types:
+            raise WordNetError("Relation '{}' is not a correct relation".format(relation))
+
+        for adj_synset_id, data in self._graph.adj[synset_id1].items():
+            if adj_synset_id == synset_id2 and data['label'] == relation:
+                return True
+
+        return False
+
+    def add_relation_type(self, relation_type: str):
+        if not isinstance(relation_type, str):
+            raise TypeError("Argument 'relation_type' has incorrect type, expected str, got {}"
+                            .format(type(relation_type).__name__))
+        if relation_type in self._relation_types:
+            raise WordNetError("Relation type {} is already in the wordnet".format(relation_type))
+
+        self._relation_types.add(relation_type)
 
     def __call__(self, synset_id: str):
         if not isinstance(synset_id, str):
@@ -700,21 +745,119 @@ class RoWordNet(object):
             return shortest_path_list
 
 
-def intersection(wordnet_object_1, wordnet_object_2):
-    return None
+def intersection(wordnet_1, wordnet_2):
+    if not isinstance(wordnet_1, RoWordNet):
+        raise TypeError("Argument 'wordnet_1' has incorrect type, expected RoWordNet, got {}"
+                        .format(type(wordnet_1).__name__))
+    if not isinstance(wordnet_2, RoWordNet):
+        raise TypeError("Argument 'wordnet_2' has incorrect type, expected RoWordNet, got {}"
+                        .format(type(wordnet_2).__name__))
+
+    intersection_wordnet = RoWordNet(empty=True)
+
+    for synset_id in wordnet_1.synsets():
+        synset = wordnet_1.synset(synset_id)
+        if wordnet_2.synset_exists(synset):
+            intersection_wordnet.add_synset(synset)
+
+    relations_type_wn1 = wordnet_1.relation_types
+    relations_type_wn2 = wordnet_2.relation_types
+
+    for relation_type_wn1 in relations_type_wn1:
+        for relation_type_wn2 in relations_type_wn2:
+            if relation_type_wn1 == relation_type_wn2:
+                intersection_wordnet.add_relation_type(relation_type_wn1)
+                break
+
+    for synset_id in wordnet_1.synsets():
+        relations_wn1 = wordnet_1.outbound_relations(synset_id)
+        for relation_wn1 in relations_wn1:
+            try:
+                intersection_wordnet.add_relation(synset_id, relation_wn1[0], relation_wn1[1])
+            except WordNetError:
+                pass
+
+    return intersection_wordnet
 
 
-def union(wordnet_object_1, wordnet_object_2):
-    return None
+def merge(wordnet_1: RoWordNet, wordnet_2: RoWordNet):
+    if not isinstance(wordnet_1, RoWordNet):
+        raise TypeError("Argument 'wordnet_1' has incorrect type, expected RoWordNet, got {}"
+                        .format(type(wordnet_1).__name__))
+    if not isinstance(wordnet_2, RoWordNet):
+        raise TypeError("Argument 'wordnet_2' has incorrect type, expected RoWordNet, got {}"
+                        .format(type(wordnet_2).__name__))
+
+    new_wordnet = RoWordNet(empty=True)
+
+    # copying the second wordnet
+    for synset_id in wordnet_2.synsets():
+        synset = wordnet_2.synset(synset_id)
+        new_wordnet.add_synset(synset)
+
+    relations_type = wordnet_2.relation_types
+    for relation_type in relations_type:
+        new_wordnet.add_relation_type(relation_type)
+
+    for synset_id in wordnet_2.synsets():
+        relations = wordnet_2.outbound_relations(synset_id)
+        for relation in relations:
+            new_wordnet.add_relation(synset_id, relation[0], relation[1])
+
+    # add the first wordnet
+    relations_type = wordnet_1.relation_types
+    for relation_type in relations_type:
+        try:
+            new_wordnet.add_relation_type(relation_type)
+        except WordNetError:
+            pass
+
+    for synset_id in wordnet_1.synsets():
+        try:
+            synset = wordnet_1.synset(synset_id)
+            new_wordnet.add_synset(synset)
+        except WordNetError:
+            pass
+
+    for synset_id in wordnet_1.synsets():
+        relations = wordnet_1.outbound_relations(synset_id)
+        for relation in relations:
+            try:
+                new_wordnet.add_relation(synset_id, relation[0], relation[1])
+            except WordNetError:
+                pass
+
+    return new_wordnet
 
 
-def merge(wordnet_object_1, wordnet_object_2):
-    return None
+def difference(wordnet_1, wordnet_2):
+    if not isinstance(wordnet_1, RoWordNet):
+        raise TypeError("Argument 'wordnet_1' has incorrect type, expected RoWordNet, got {}"
+                        .format(type(wordnet_1).__name__))
+    if not isinstance(wordnet_2, RoWordNet):
+        raise TypeError("Argument 'wordnet_2' has incorrect type, expected RoWordNet, got {}"
+                        .format(type(wordnet_2).__name__))
 
+    diff_synsets = set()
+    diff_relations = set()
 
-def complement(wordnet_object_1, wordnet_object_2):
-    return None
+    for synset_id in wordnet_2.synsets():
+        try:
+            synset1 = wordnet_1.synset(synset_id)
+            synset2 = wordnet_2.synset(synset_id)
+            if synset1 != synset2:
+                diff_synsets.add(synset_id)
+        except WordNetError:
+            diff_synsets.add(synset_id)
 
+    for synset_id in wordnet_2.synsets():
+        relations = wordnet_2.outbound_relations(synset_id)
+        for relation in relations:
+            try:
+                if not wordnet_1.relation_exists(synset_id, relation[0], relation[1]):
+                    diff_relations.add((synset_id, relation[1], relation[0]))
+            except WordNetError:
+                diff_relations.add((synset_id, relation[1], relation[0]))
 
-def difference(wordnet_object_1, wordnet_object_2):
-    return None
+    return diff_synsets if len(diff_synsets) > 0 else None, diff_relations if len(diff_relations) > 0 else None
+

@@ -304,3 +304,20 @@ class Synset(object):
     def __repr__(self):
         return "Synset(id={!r}, literals={!r}, definition={!r})".format(self._id, self._literals, self._definition)
 
+    def __eq__(self, other):
+        if isinstance(other, Synset):
+            if (self.id == other.id and
+                    self.literals == other.literals and
+                    self.literals_senses == other.literals_senses and
+                    self.pos == other.pos and
+                    self.definition == other.definition and
+                    self.stamp == other.stamp and
+                    self.domain == other.domain and
+                    self.sumo == other.sumo and
+                    self.sumotype == other.sumotype and
+                    self.sentiwn == other.sentiwn and
+                    self.nonlexicalized == other.nonlexicalized):
+
+                return True
+
+        return False
