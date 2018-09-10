@@ -36,8 +36,8 @@ ____
 ## Basic Usage
 
 ```python
-import rowordnet
-wn = rowordnet.rowordnet()
+import rowordnet as rwn
+wn = rwn.RoWordNet()
 ```
 
 And you're good to go. We present a few basic usage examples here:
