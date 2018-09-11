@@ -2,8 +2,16 @@
 __pycache__/
 /.idea/
 .idea/
+.pypirc
 
-*.xml
+# build dist
+/build
+/dist
+
+# Python egg metadata, regenerated from source files by setuptools.
+/*.egg-info
+
+rowordnet/*.xml
 
 # Folder config file
 [Dd]esktop.ini

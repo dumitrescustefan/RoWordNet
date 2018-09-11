@@ -1,0 +1,14 @@
+/__pycache__/
+__pycache__/
+/.idea/
+.idea/
+
+# Python egg metadata, regenerated from source files by setuptools.
+/*.egg-info
+
+*.xml
+
+# Folder config file
+[Dd]esktop.ini
+/**/[Dd]esktop.ini
+**/[Dd]esktop.ini
