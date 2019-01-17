@@ -4,8 +4,8 @@ import lxml.etree as et
 from collections import defaultdict
 from queue import Queue
 
-from .synset import Synset
-from .exceptions import WordNetError
+from synset import Synset
+from exceptions import WordNetError
 
 
 class RoWordNet(object):
@@ -38,7 +38,7 @@ class RoWordNet(object):
 
         if filename is None:
             import pkg_resources
-            path = "rowordnet.pickle"  # always use slash
+            path = "rowordnet.pickle"
             filepath = pkg_resources.resource_filename(__name__, path)
             self._load_from_binary(filepath)
             return
@@ -186,7 +186,8 @@ class RoWordNet(object):
             self._synsets[synset.id] = synset
 
     def _load_from_binary(self, filename: str):
-        wn = pickle.load(open(filename, "rb"))
+        with open(filename, "rb") as f:
+            wn = pickle.load(f)
 
         self._clean()
 
@@ -254,7 +255,8 @@ class RoWordNet(object):
         tree.write(filename, encoding="utf-8", pretty_print=True)
 
     def _save_to_binary(self, filename: str):
-        pickle.dump(self, open(filename, "wb"))
+        with open(filename, "wb") as f:
+            pickle.dump(self, f, protocol=3)
 
     def synsets(self, literal: str = None, pos: Synset.Pos = None):
         """

@@ -1,5 +1,5 @@
 from enum import Enum
-from .exceptions import SynsetError
+from exceptions import SynsetError
 
 
 class Synset(object):

@@ -1,243 +1,82 @@
-import os, sys, subprocess
+import os, sys, subprocess, time
 import unittest
 
 class Main_Tests(unittest.TestCase):
-    def test_1_count_literals(self):                                    
-        import rowordnet        
-        wn = rowordnet.RoWordNet()
+    def test_basic_ops(self):                                    
+        from rowordnet import RoWordNet
+        from synset import Synset
+        
+        wn = RoWordNet()
         word = 'arbore'
         synset_ids = wn.synsets(literal=word)
-        print("\n\tTotal number of synsets containing literal '{}': {}".format(word, len(synset_ids)))
+        print("\nTotal number of synsets containing literal '{}': {}".format(word, len(synset_ids)))
         self.assertTrue(len(synset_ids)>0)
         
+        synsets_id_nouns = wn.synsets(pos=Synset.Pos.NOUN)
+        print("\tTotal number of noun synsets: {}".format(len(synsets_id_nouns)))
+        self.assertTrue(len(synsets_id_nouns)>0)
+    
+        synsets_id_verbs = wn.synsets(pos=Synset.Pos.VERB)
+        print("\tTotal number of verb synsets: {}".format(len(synsets_id_verbs)))
+        self.assertTrue(len(synsets_id_verbs)>0)
+        
+        synsets_id_adjectives = wn.synsets(pos=Synset.Pos.ADJECTIVE)
+        print("\tTotal number of adjective synsets: {}".format(len(synsets_id_adjectives)))
+        self.assertTrue(len(synsets_id_adjectives)>0)
+        
+        synsets_id_adverbs = wn.synsets(pos=Synset.Pos.ADVERB)
+        print("\tTotal number of adverb synsets: {}".format(len(synsets_id_adverbs)))
+        self.assertTrue(len(synsets_id_adverbs)>0)
+    
+        # search for a word(here knows as a literal) in all noun synsets
+        word = 'cal'
+        print("\tSearch for all noun synsets that contain word/literal '{}'".format(word))    
+        synset_ids = wn.synsets(literal=word, pos=Synset.Pos.NOUN)
+        print("\t\tTotal number of noun synsets containing word/literal '{}' is {}".format(word, len(synset_ids)))        
+        self.assertTrue(len(synset_ids)>0)
+        
+    def test_io(self):       
+        from rowordnet import RoWordNet
+        
+        # load internal rowordnet
+        print("\nLoading from internal resources (binary)")
+        start = time.perf_counter()
+        wn = RoWordNet()
+        print("\t\t... done in {:.3f}s".format(time.perf_counter() - start))
+        self.assertTrue(len(wn.synsets())>0)    
+
+        # save rowordnet to xml
+        print("\nSaving the rowordnet in xml file")
+        start = time.perf_counter()
+        wn.save("rowordnet.xml", xml=True)
+        print("\t\t... done in {:.3f}s".format(time.perf_counter() - start))
+        self.assertTrue(len(wn.synsets())>0)
+        
+        # load rowordnet from xml
+        print("\nLoad the rowordnet from xml file")
+        start = time.perf_counter()
+        wn.load("rowordnet.xml", xml=True)
+        print("\t\t... done in {:.3f}s".format(time.perf_counter() - start))
+        self.assertTrue(len(wn.synsets())>0)
+        
+        # save rowordnet to binary
+        print("\nSaving the rowordnet in binary file")
+        start = time.perf_counter()
+        wn.save("rowordnet.pickle")
+        print("\t\t... done in {:.3f}s".format(time.perf_counter()-start))
+        self.assertTrue(len(wn.synsets())>0)
+        
+        # load rowordnet from binary
+        print("\nLoad the rowordnet from binary file")
+        start = time.perf_counter()
+        wn.load("rowordnet.pickle")
+        print("\t\t... done in {:.3f}s".format(time.perf_counter() - start))
+        self.assertTrue(len(wn.synsets())>0)
+        
 if __name__ == '__main__':
-    unittest.main()
-
-
-"""
-def demo_basic_rowordnet_operations():
-    print("\n\nThis demo shows the basic components and operations of the RoWordNet.\n"+"_"*70)
-    # load rowordnet from internal resources
-    wn = rowordnet.RoWordNet()
-   
-    # RoWordNet is composed of synsets linked together by semantic relations
-    
-    # the first operation is to search for a word. This will return one or more synsets.    
-    word = 'arbore'
-    synset_ids = wn.synsets(literal=word)
-    print("\n\tTotal number of synsets containing literal '{}': {}".format(word, len(synset_ids)))
-    print(synset_ids)
-  
-    # get a synset and print detailed information about it
-    print("\n\tPrint detailed information about the first of these synsets:")
-    synset_id = synset_ids[0]
-    wn.print_synset(synset_id)
-    
-    # get the object itself
-    print("\n\tGet the object itself by its id = {}, calling wn.synset():".format(synset_id))
-    synset_object = wn.synset(synset_id)
-    print("\t\t"+str(synset_object))
-    
-    print("\n\tGet the object itself by its id = {}, calling wn() directly:".format(synset_id))
-    synset_object = wn(synset_id)
-    print("\t\t"+str(synset_object))
-    
-    # print its literals, definition and id
-    print("\n\tPrint its literals (synonym words): {}".format(synset_object.literals))
-    print("\tPrint its definition: {}".format(synset_object.definition))
-    print("\tPrint its id: {}".format(synset_object.id))
-        
-    # get all synsets as a list of synset IDs (list of strings)
-    synsets_id = wn.synsets()
-    print("\n\tTotal number of synsets: {} \n".format(len(synsets_id)))
-    # example of iterating through synsets
-    for synset_id in synsets_id:
-        # get the synsets objects from the rowordnet by their IDs
-        synset_object = wn(synset_id)
-        # do something with the object
-        pass
-
-    # there are 4 types of parts of speech in RoWordNet : Nouns, Verbs, Adjectives and Adverbs
-    # return all noun synsets
-    synsets_id_nouns = wn.synsets(pos=Synset.Pos.NOUN)
-    print("\tTotal number of noun synsets: {}".format(len(synsets_id_nouns)))
-    # return all verb synsets
-    synsets_id_verbs = wn.synsets(pos=Synset.Pos.VERB)
-    print("\tTotal number of verb synsets: {}".format(len(synsets_id_verbs)))
-    # return all adjective synsets
-    synsets_id_adjectives = wn.synsets(pos=Synset.Pos.ADJECTIVE)
-    print("\tTotal number of adjective synsets: {}".format(len(synsets_id_adjectives)))
-    # return all adverb synsets
-    synsets_id_adverbs = wn.synsets(pos=Synset.Pos.ADVERB)
-    print("\tTotal number of adverb synsets: {}".format(len(synsets_id_adverbs)))
-    
-    # search for a word(here knows as a literal) in all noun synsets
-    word = 'cal'
-    print("\tSearch for all noun synsets that contain word/literal '{}'".format(word))    
-    synset_ids = wn.synsets(literal=word, pos=Synset.Pos.NOUN)
-    print("\t\tTotal number of noun synsets containing word/literal '{}' is {}, listed below:".format(word, len(synset_ids)))
-    for synset_id in synset_ids:
-        print("\t\t"+str(wn(synset_id)))
-   
-    # we continue with examples of navigating in the Wordnet 
-    print("\n\tExamples of navigating the wordnet:")
-    
-    # get a synset
-    synset_id = wn.synsets()[0]
-    # get the path from a given synset to its root in hypermyn tree
-    print("\tList of synset ids from synset with id '{}' up to its root in the hypermyn tree: ".format(synset_id))
-    print("\t\t{}".format(wn.synset_to_hypernym_root(synset_id)))
-
-    # print all outbound relations of a synset
-    synset_id = wn.synsets("tren")[2]
-    print("\n\tPrint all outbound relations of {}".format(wn(synset_id)))
-    outbound_relations = wn.outbound_relations(synset_id)
-    for outbound_relation in outbound_relations:
-        target_synset_id = outbound_relation[0]        
-        relation = outbound_relation[1]
-        print("\t\tRelation [{}] to synset {}".format(relation, wn(target_synset_id)))
-        
-    # print all inbound relations of a synset, short syntax
-    print("\n\tPrint all outbound relations of {}".format(wn(synset_id)))    
-    for source_synset_id, relation in wn.inbound_relations(synset_id):
-        print("\t\tRelation [{}] from synset {}".format(relation, wn(source_synset_id)))
-        
-    # get all relations of the same synset
-    relations = wn.relations(synset_id)
-    print("\tThe synset has {} total relations.".format(len(relations)))
-
-    # get the shortest path between two synsets
-    synset1_id = wn.synsets("cal")[2]
-    synset2_id = wn.synsets("iepure")[0]    
-    distance = wn.shortest_path(synset1_id, synset2_id)
-    print("\n\tList of synsets containing the shortest path from synset with id '{}' to synset with id '{}': "
-          .format(synset1_id, synset2_id))
-    print("\t\t{}".format(distance))
-
-    # get a new synset
-    new_synset_id = wn.synsets("cal")[2]
-    # travel the graph Breadth First 
-    counter = 0
-    print("\n\tTravel breadth-first through wordnet starting with synset '{}' (first 10 synsets) ..."
-          .format(new_synset_id))
-    for current_synset_id, relation, from_synset_id in wn.bfwalk(new_synset_id):
-        counter += 1
-        # bfwalk is a generator that yields, for each call, a BF step through wordnet 
-        # you do actions with current_synset_id, relation, from_synset_id
-        print("\t\t Step {}: from synset {}, with relation [{}] to synset {}".format(counter, from_synset_id, relation,
-                                                                                     current_synset_id))
-        if counter >= 10:
-            break
-        
-    # get the lowest common ancestor in the hypernym tree
-    synset1_id = wn.synsets("cal")[2]
-    synset2_id = wn.synsets("iepure")[0]
-    synset_id = wn.lowest_hypernym_common_ancestor(synset1_id, synset2_id)
-    print("\n\tThe lowest common ancestor in the hypernym tree of synset: "
-          "\n\t\t{} \n\t\t  and \n\t\t{} \n\t\t  is \n\t\t{}"
-          .format(wn(synset1_id), wn(synset2_id), wn(synset_id)))
-          
-    # print all relation types existing in RoWordNet
-    print("\n\tList all relation types existing in RoWordNet:")
-    for relation in wn.relation_types: # this is a property
-        print("\t\t{}".format(relation))
-
-
-def demo_get_synonymy_antonymy():
-    import itertools
-
-    print("\n\nThis demo shows a bit more advanced series of ops.\n" + "_" * 70)
-
-    # load from binary wordnet
-    wn = rowordnet.RoWordNet()
-
-    print("\n\tTask: We would like to extract a list of synonyms and antonyms from all the nouns in RoWordNet.")
-
-    # get synonymy relations
-    print("\n\tWe first extract synonyms directly from synsets. We list all noun synsets then iterate "
-          "\n\tthrough them and create pairs from each synset.")
-
-    synonyms = []
-    synsets_id = wn.synsets()
-    # for each synset, we create a list of synonyms between its literals
-    for synset_id in synsets_id:
-        # the literals object is a dict, but we need only the
-        # actual literals (not senses)
-        synset = wn(synset_id)
-        literals = list(synset.literals)
-        for i in range(len(literals)):
-            for j in range(i+1, len(literals)):
-                # append a tuple containing a pair of synonym literals
-                synonyms.append((literals[i], literals[j]))
-
-    # list a few synonyms
-    print("\n\tList of the first 5 synonyms: ({} total synonym pairs extracted)".format(len(synonyms)))
-    for i in range(5):
-        print("\t\t {:>25} == {}".format(synonyms[i][0], synonyms[i][1]))
-
-    # now, antonyms
-    antonyms = []
-    print("\n\tWe now want to extract antonyms. We look at all the antonymy relations and then for each "
-          "\n\tpair of synsets in this relation we generate a cartesian product between their literals.")
-
-    # extract all the antonymy relations from the graph and create a
-    # list of synset pairs
-    synset_pairs = []
-
-    synsets_id = wn.synsets()  # extract all synsets
-    for synset_id in synsets_id:
-        synset = wn(synset_id)
-        # extract the antonyms of a synset
-        synset_outbound_id = wn.outbound_relations(synset.id)
-        synset_antonyms_id = [synset_tuple[0] for synset_tuple in synset_outbound_id
-                              if synset_tuple[1] == 'near_antonym']
-
-        for synset_antonym_id in synset_antonyms_id:  # for each antonym synset
-            synset_antonym = wn(synset_antonym_id)
-            # if the antonymy pair doesn't already exists
-            if (synset_antonym, synset) not in synset_pairs:
-                # add the antonym tuple to the list
-                synset_pairs.append((synset, synset_antonym))
-
-    # for each synset pair extract its literals, so we now have a list of
-    # pairs of literals
-    literal_pairs = []
-    for synset_pair in synset_pairs:
-        # extract the literals of the first synset in the pair
-        synset1_literals = list(synset_pair[0].literals)
-        # extract the literals of the second synset in the pair
-        synset2_literals = list(synset_pair[1].literals)
-        # add a tuple containing the literals of each synset
-        literal_pairs.append((synset1_literals, synset2_literals))
-
-    # for each literals pair, we generate the cartesian product between them
-    for literal_pair in literal_pairs:
-        for antonym_tuple in itertools.product(literal_pair[0], literal_pair[1]):
-            antonyms.append(antonym_tuple)
-
-    # list a few antonyms
-    print("\n\tList of the first 5 antonyms: ({} total antonym pairs extracted)".format(len(antonyms)))
-    for i in range(5):
-        print("\t\t {:>25} != {}".format(antonyms[i][0], antonyms[i][1]))
-
-
-def demo_load_and_save_rowordnet():
-    import time
-
-    print("\n\nThis demo shows how to initialize, save and load a rowordnet object.\n" + "_"*70)
-    
-    # load internal rowordnet
-    print("\n\t Loading from internal resources (binary)")
-    start = time.perf_counter()
-    wn = rowordnet.RoWordNet()
-    print("\t\t... done in {:.3f}s".format(time.perf_counter() - start))
-
-    # save rowordnet to xml
-    print("\n\t Saving the rowordnet in xml file")
-    start = time.perf_counter()
-    wn.save("rowordnet.xml", xml=True)
-    print("\t\t... done in {:.3f}s".format(time.perf_counter() - start))
-    
+    """ Recreate bynary from xml
+    from rowordnet import RoWordNet
+    wn = RoWordNet(empty=True)
     # load rowordnet from xml
     print("\n\t Load the rowordnet from xml file")
     start = time.perf_counter()
@@ -249,14 +88,11 @@ def demo_load_and_save_rowordnet():
     start = time.perf_counter()
     wn.save("rowordnet.pickle")
     print("\t\t... done in {:.3f}s".format(time.perf_counter()-start))
+    """
     
-    # load rowordnet from binary
-    print("\n\t Load the rowordnet from binary file")
-    start = time.perf_counter()
-    wn.load("rowordnet.pickle")
-    print("\t\t... done in {:.3f}s".format(time.perf_counter() - start))
+    unittest.main()
 
-
+"""
 def demo_create_and_edit_synsets():
     print("\n\nThis demo shows how to create and edit synsets & relations.\n"+"_"*70)
         
