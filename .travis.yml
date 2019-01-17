@@ -6,7 +6,7 @@ python:
 install:
   - pip install -r requirements.txt
 # command to install dependencies
-script: rowordnet/unit-tests.py
+script: python rowordnet/unit-tests.py
 branches:
   only:
     - master
