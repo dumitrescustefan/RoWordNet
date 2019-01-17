@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/dumitrescustefan/RoWordNet.svg?branch=master)](https://travis-ci.org/dumitrescustefan/RoWordNet)
+
 # RoWordNet
 
 **RoWordNet stand for Romanian WordNet, a semantic network for the Romanian language**. RoWordNet mimics Princeton WordNet, a large lexical database of English. 
