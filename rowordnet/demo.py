@@ -1,12 +1,12 @@
-from rowordnet import RoWordNet
-from synset import Synset
-from rowordnet import intersection, merge, difference
+import .rowordnet
+from .synset import Synset
+from .rowordnet import intersection, merge, difference
 
 
 def demo_basic_rowordnet_operations():
     print("\n\nThis demo shows the basic components and operations of the RoWordNet.\n"+"_"*70)
     # load rowordnet from internal resources
-    wn = RoWordNet()
+    wn = rowordnet.RoWordNet()
    
     # RoWordNet is composed of synsets linked together by semantic relations
     
@@ -137,7 +137,7 @@ def demo_get_synonymy_antonymy():
     print("\n\nThis demo shows a bit more advanced series of ops.\n" + "_" * 70)
 
     # load from binary wordnet
-    wn = RoWordNet()
+    wn = rowordnet.RoWordNet()
 
     print("\n\tTask: We would like to extract a list of synonyms and antonyms from all the nouns in RoWordNet.")
 
@@ -217,7 +217,7 @@ def demo_load_and_save_rowordnet():
     # load internal rowordnet
     print("\n\t Loading from internal resources (binary)")
     start = time.perf_counter()
-    wn = RoWordNet()
+    wn = rowordnet.RoWordNet()
     print("\t\t... done in {:.3f}s".format(time.perf_counter() - start))
 
     # save rowordnet to xml
@@ -308,7 +308,7 @@ def demo_create_and_edit_synsets():
     print("\tSynset's sumotype has been changed to '{}'".format(synset.sumotype))          
           
     # generate a new id with default prefix and suffix
-    wn = RoWordNet()
+    wn = rowordnet.RoWordNet()
     id = wn.generate_synset_id()
     print("\n\tNew id '{}' generated with default prefix 'ENG30-' and suffix '-n'".format(id))
     # generate a new id with custom prefix and suffix
@@ -367,8 +367,8 @@ def demo_create_and_edit_synsets():
 
 
 def demo_operations_rowordnet():
-    wn1 = RoWordNet()
-    wn2 = RoWordNet()
+    wn1 = rowordnet.RoWordNet()
+    wn2 = rowordnet.RoWordNet()
 
     # add a new synset to the second wordnet
     new_synset_id = wn1.generate_synset_id()
@@ -400,14 +400,14 @@ def demo_operations_rowordnet():
 
 if __name__ == '__main__':
     # rowordnet basic usage
-    demo_basic_rowordnet_operations()
+    #demo_basic_rowordnet_operations()
     
     # rowordnet advanced usage
-    demo_get_synonymy_antonymy()
+    #demo_get_synonymy_antonymy()
     
     # rowordnet editing
-    demo_load_and_save_rowordnet()
-    demo_create_and_edit_synsets()
+    #demo_load_and_save_rowordnet()
+    #demo_create_and_edit_synsets()
 
     # rowordnet operations
     demo_operations_rowordnet()

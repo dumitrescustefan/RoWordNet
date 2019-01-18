@@ -5,12 +5,11 @@ from setuptools import setup, find_packages
 with open("README.md", "r", encoding="utf8") as fh:
     long_description = fh.read()
 
-
 setup(
     # $ pip install sampleproject    
     name='rowordnet',  # Required
    
-    version='0.9.4',  # Required
+    version='0.9.3',  # Required
 
     description='Python API for the Romanian WordNet',  # Required
 
