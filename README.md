@@ -156,3 +156,11 @@ or in .bib format:
 ```
 @inproceedings{dumitrescu2018rowordnet, title={RoWordNet--A Python API for the Romanian WordNet}, author={Dumitrescu, Stefan Daniel and Avram, Andrei Marius and Morogan, Luciana and Toma, Stefan-Adrian}, booktitle={2018 10th International Conference on Electronics, Computers and Artificial Intelligence (ECAI)}, pages={1--6}, year={2018}, organization={IEEE}}
 ```
+
+## Online query/visualizer for RoWordNet
+
+Because there are many visitors that just want an **online interface to query RoWordNet**, please go to:
+
+[http://dcl.bas.bg/bulnet/](http://dcl.bas.bg/bulnet/)
+
+and choose in the upper right corner **PWN \& RoWN**. This interface provides pretty much the whole data available in this repo (after all it's a visualization interface) and it also includes mappings to Princeton's WordNet. Please note that this link is not associated with us in any way - we just use the same basic data and package it in an API for programatic use. By providing this link we're trying to help out people that just want to browse RoWordNet without having to code anything. 
