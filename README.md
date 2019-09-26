@@ -143,10 +143,18 @@ Dan Tufiş, Verginica Barbu Mititelu, The Lexical Ontology for Romanian, in Nuri
 or in .bib format:
 
 ```
-@InBook{DTVBMzock,title = "The Lexical Ontology for Romanian",author = "Tufiș, Dan and Barbu Mititelu, Verginica",booktitle = "Language Production, Cognition, and the Lexicon",editor = "Nuria Gala, Reinhard Rapp, Nuria Bel-Enguix",series = "Text, Speech and Language Technology",volume = "48",year = "2014",publisher = "Springer",pages = "491-504"}
+@InBook{DTVBMzock,
+  title = "The Lexical Ontology for Romanian",
+  author = "Tufiș, Dan and Barbu Mititelu, Verginica",booktitle = "Language Production, Cognition, and the Lexicon",
+  editor = "Nuria Gala, Reinhard Rapp, Nuria Bel-Enguix",
+  series = "Text, Speech and Language Technology",
+  volume = "48",
+  year = "2014",
+  publisher = "Springer",
+  pages = "491-504"}
 ```
 
-.. and also to the autors of this API:
+.. and also to the autors of this [API](https://ieeexplore.ieee.org/abstract/document/8679089):
 
 ```
 S. D. Dumitrescu, A. M. Avram, L. Morogan and S. Toma, "RoWordNet – A Python API for the Romanian WordNet," 2018 10th International Conference on Electronics, Computers and Artificial Intelligence (ECAI), Iasi, Romania, 2018, pp. 1-6.
@@ -154,7 +162,14 @@ S. D. Dumitrescu, A. M. Avram, L. Morogan and S. Toma, "RoWordNet – A Python A
 or in .bib format:
 
 ```
-@inproceedings{dumitrescu2018rowordnet, title={RoWordNet--A Python API for the Romanian WordNet}, author={Dumitrescu, Stefan Daniel and Avram, Andrei Marius and Morogan, Luciana and Toma, Stefan-Adrian}, booktitle={2018 10th International Conference on Electronics, Computers and Artificial Intelligence (ECAI)}, pages={1--6}, year={2018}, organization={IEEE}}
+@inproceedings{dumitrescu2018rowordnet,
+  title={RoWordNet--A Python API for the Romanian WordNet},
+  author={Dumitrescu, Stefan Daniel and Avram, Andrei Marius and Morogan, Luciana and Toma, Stefan-Adrian},
+  booktitle={2018 10th International Conference on Electronics, Computers and Artificial Intelligence (ECAI)},
+  pages={1--6},
+  year={2018},
+  organization={IEEE}
+}
 ```
 
 ## Online query/visualizer for RoWordNet
