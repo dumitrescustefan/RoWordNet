@@ -332,13 +332,13 @@ class RoWordNet(object):
 
         outbound_relations = self.outbound_relations(synset_id)
         print("\t  Outbound relations: ")
-        for synset_id, relation in outbound_relations:
-            print("\t\t  {} - {}".format(synset_id, relation))
+        for out_synset_id, relation in outbound_relations:
+            print("\t\t  {} - {}".format(out_synset_id, relation))
 
         inbound_relations = self.inbound_relations(synset_id)
         print("\t  Inbound relations: ")
-        for synset_id, relation in inbound_relations:
-            print("\t\t  {} - {}".format(synset_id, relation))
+        for in_synset_id, relation in inbound_relations:
+            print("\t\t  {} - {}".format(in_synset_id, relation))
 
     def synset_exists(self, synset: Synset):
         if not isinstance(synset, Synset):
