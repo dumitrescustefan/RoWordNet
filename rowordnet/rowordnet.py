@@ -750,6 +750,42 @@ class RoWordNet(object):
             shortest_path_list.reverse()
             return shortest_path_list
 
+    def path_similarity(self, synset_id1: str, synset_id2: str):
+        """
+            Returns the path similarity between two synsets.
+            Args:
+                synset_id1 (str): Id of the first synset.
+                synset_id2 (str): Id of the second synset.
+            Returns:
+                float: 1 if the synsets are equal, None if there is no path between the synsets or
+                       1 / 1/(shortest_path_distance + 1) otherwise.
+            Raises:
+                TypeError: If any argument has incorrect type.
+                WordNerError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
+                    value.
+        """
+        if not isinstance(synset_id1, str):
+            raise TypeError("Argument 'synset_id1' has incorrect type, expected str, got {}"
+                            .format(type(synset_id1).__name__))
+        if not isinstance(synset_id2, str):
+            raise TypeError("Argument 'synset_id2' has incorrect type, expected str, got {}"
+                            .format(type(synset_id2).__name__))
+
+        if synset_id1 not in self._synsets:
+            raise WordNetError("Synset with id '{}' is not in the wordnet".format(synset_id1))
+        if synset_id2 not in self._synsets:
+            raise WordNetError("Synset with id '{}' is not in the wordnet".format(synset_id2))
+
+        if synset_id1 == synset_id2:
+            return 1
+
+        try:
+            shortest_path_distance = len(self.shortest_path(synset_id1, synset_id2))
+        except nx.exception.NetworkXNoPath:
+            return None
+
+        return 1 / (shortest_path_distance + 1)
+
 
 def intersection(wordnet_1, wordnet_2):
     if not isinstance(wordnet_1, RoWordNet):
