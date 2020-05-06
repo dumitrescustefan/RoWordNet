@@ -624,7 +624,7 @@ class RoWordNet(object):
                 synset_id1 (str): Id of the first synset.
                 synset_id2 (str): Id of the second synset.
             Returns:
-                str: A synset representing the lowest common ancestor in the specified tree.
+                str: A synset ID representing the lowest common ancestor in the specified tree.
             Raises:
                 TypeError: If any argument has incorrect type.
                 WordNerError: If there's no synset with the given ids in the wordnet.value.
@@ -813,8 +813,12 @@ class RoWordNet(object):
             raise WordNetError("Synset with id '{}' is not in the wordnet".format(synset_id2))
 
         depth_synset1 = len(self.synset_to_hypernym_root(synset_id1))
+        depth_synset2 = len(self.synset_to_hypernym_root(synset_id2))
 
-        return 0
+        lcs_synset = self.lowest_hypernym_common_ancestor(synset_id1, synset_id2)
+        depth_lcs_synset = len(self.synset_to_hypernym_root(lcs_synset))
+
+        return 2 * depth_lcs_synset / (depth_synset1 + depth_synset2)
 
 
 def intersection(wordnet_1, wordnet_2):
