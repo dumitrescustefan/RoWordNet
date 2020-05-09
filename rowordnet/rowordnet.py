@@ -3,6 +3,7 @@ import networkx as nx
 import lxml.etree as et
 from collections import defaultdict
 from queue import Queue
+import math
 
 from .synset import Synset
 from .exceptions import WordNetError
@@ -819,6 +820,50 @@ class RoWordNet(object):
         depth_lcs_synset = len(self.synset_to_hypernym_root(lcs_synset))
 
         return 2 * depth_lcs_synset / (depth_synset1 + depth_synset2)
+
+    def _hypernym_tree_height(self, root_id):
+        depths = []
+
+        for adj_synset_id, data in self._graph.adj[root_id].items():
+            if data['label'] == 'hyponym':
+                depths.append(self._hypernym_tree_height(adj_synset_id))
+
+        if len(depths) == 0:
+            return 0
+
+        return max(depths) + 1
+
+    def lch_similarity(self, synset_id1: str, synset_id2: str):
+        """
+            Returns the path similarity between two synsets.
+            Args:
+                synset_id1 (str): Id of the first synset.
+                synset_id2 (str): Id of the second synset.
+            Returns:
+                float: 1 if the synsets are equal, None if there is no path between the synsets or
+                       1 / 1/(shortest_path_distance + 1) otherwise.
+            Raises:
+                TypeError: If any argument has incorrect type.
+                WordNerError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
+                    value.
+        """
+        if not isinstance(synset_id1, str):
+            raise TypeError("Argument 'synset_id1' has incorrect type, expected str, got {}"
+                            .format(type(synset_id1).__name__))
+        if not isinstance(synset_id2, str):
+            raise TypeError("Argument 'synset_id2' has incorrect type, expected str, got {}"
+                            .format(type(synset_id2).__name__))
+
+        if synset_id1 not in self._synsets:
+            raise WordNetError("Synset with id '{}' is not in the wordnet".format(synset_id1))
+        if synset_id2 not in self._synsets:
+            raise WordNetError("Synset with id '{}' is not in the wordnet".format(synset_id2))
+
+        root_id = "ENG30-00002684-n"
+        max_hypernym_depth = self._hypernym_tree_height(root_id)
+        shortest_path_distance = len(self.shortest_path(synset_id1, synset_id2, relations={"hypernym", "hyponym"}))
+
+        return - math.log2((shortest_path_distance + 1) / (2 * max_hypernym_depth))
 
 
 def intersection(wordnet_1, wordnet_2):
