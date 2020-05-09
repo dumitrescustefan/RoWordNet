@@ -794,8 +794,8 @@ class RoWordNet(object):
                synset_id1 (str): Id of the first synset.
                synset_id2 (str): Id of the second synset.
            Returns:
-               float: distance between synsets defined as
-                      2*depth(least_common_subsumer(synset1,synset2))) / (depth(synset1) + depth(synset2)).
+               float: None if there is no path between the synsets or distance between synsets defined as
+                      2 * depth(least_common_subsumer(synset1,synset2))) / (depth(synset1) + depth(synset2)) otherwise.
            Raises:
                TypeError: If any argument has incorrect type.
                WordNerError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
@@ -835,13 +835,13 @@ class RoWordNet(object):
 
     def lch_similarity(self, synset_id1: str, synset_id2: str):
         """
-            Returns the path similarity between two synsets.
+            Returns the Leacock and Chodorow similarity between two synsets.
             Args:
                 synset_id1 (str): Id of the first synset.
                 synset_id2 (str): Id of the second synset.
             Returns:
-                float: 1 if the synsets are equal, None if there is no path between the synsets or
-                       1 / 1/(shortest_path_distance + 1) otherwise.
+                float: None if there is no path between the synsets or distance between synsets defined as
+                       -log ((dist(synset1,synset2)+1) / (2 * maximum taxonomy depth)) otherwise.
             Raises:
                 TypeError: If any argument has incorrect type.
                 WordNerError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
@@ -859,9 +859,13 @@ class RoWordNet(object):
         if synset_id2 not in self._synsets:
             raise WordNetError("Synset with id '{}' is not in the wordnet".format(synset_id2))
 
+        try:
+            shortest_path_distance = len(self.shortest_path(synset_id1, synset_id2, relations={"hypernym", "hyponym"}))
+        except nx.exception.NetworkXNoPath:
+            return None
+
         root_id = "ENG30-00002684-n"
         max_hypernym_depth = self._hypernym_tree_height(root_id)
-        shortest_path_distance = len(self.shortest_path(synset_id1, synset_id2, relations={"hypernym", "hyponym"}))
 
         return - math.log2((shortest_path_distance + 1) / (2 * max_hypernym_depth))
 
