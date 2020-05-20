@@ -34,6 +34,7 @@ ____
 * Demo on more advanced ops available as a [Jupyter notebook here](jupyter/create_edit_synsets.ipynb).
 * Demo on save/load ops available as a [Jupyter notebook here](jupyter/load_save_wordnet.ipynb).
 * Demo on synset/relation creation and editing available as a [Jupyter notebook here](jupyter/synonym_antonym.ipynb).
+* Demo on similiarity metrics available as a [Jupyter notebook here](jupyter/similarity_metrics.ipynb).
 ____
 
 ## Basic Usage
