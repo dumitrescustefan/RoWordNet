@@ -9,7 +9,7 @@ setup(
     # $ pip install sampleproject    
     name='rowordnet',  # Required
    
-    version='0.9.4',  # Required
+    version='0.9.5',  # Required
 
     description='Python API for the Romanian WordNet',  # Required
 
