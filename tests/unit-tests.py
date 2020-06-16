@@ -76,7 +76,7 @@ class Main_Tests(unittest.TestCase):
         self.assertTrue(len(wn.synsets())>0)
         
 if __name__ == '__main__':
-    """ Recreate bynary from xml
+    """ Recreate binary from xml
     from rowordnet import RoWordNet
     wn = RoWordNet(empty=True)
     # load rowordnet from xml
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     wn.save("rowordnet.pickle")
     print("\t\t... done in {:.3f}s".format(time.perf_counter()-start))
     """
-    import os, sys; #
+    import os, sys
     print ("Current unit-test file location: "+os.path.realpath(__file__))
     location_of_rowordnet_package = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),"rowordnet")
     print ("Adding "+location_of_rowordnet_package+" to path ...")

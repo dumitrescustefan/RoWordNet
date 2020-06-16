@@ -9,16 +9,16 @@ setup(
     # $ pip install sampleproject    
     name='rowordnet',  # Required
    
-    version='0.9.5',  # Required
+    version='1.0.0',  # Required
 
     description='Python API for the Romanian WordNet',  # Required
 
     long_description=long_description,
     long_description_content_type="text/markdown",
-    maintainer = "Dumitrescu Stefan and Andrei Marius Avram",
-    maintainer_email = "dumitrescu.stefan@gmail.com, avramandrei9666@gmail.com",
-    author = "Dumitrescu Stefan and Andrei Marius Avram",
-    author_email = "dumitrescu.stefan@gmail.com, avramandrei9666@gmail.com",
+    maintainer = "Stefan Daniel Dumitrescu and Andrei Marius Avram",
+    maintainer_email = "dumitrescu.stefan@gmail.com, avram.andreimarius@gmail.com",
+    author = "Stefan Daniel Dumitrescu and Andrei Marius Avram",
+    author_email = "dumitrescu.stefan@gmail.com, avram.andreimarius@gmail.com",
     
     url='https://github.com/dumitrescustefan/RoWordNet',  # Optional
 
@@ -26,7 +26,7 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
 
         'Intended Audience :: Developers',
         'Intended Audience :: Education',

@@ -400,17 +400,18 @@ def demo_operations_rowordnet():
 
 if __name__ == '__main__':
     # rowordnet basic usage
-    #demo_basic_rowordnet_operations()
+    demo_basic_rowordnet_operations()
     
     # rowordnet advanced usage
-    #demo_get_synonymy_antonymy()
+    demo_get_synonymy_antonymy()
     
     # rowordnet editing
     #demo_load_and_save_rowordnet()
     #demo_create_and_edit_synsets()
 
     # rowordnet operations
-    demo_operations_rowordnet()
+    #demo_operations_rowordnet()
+
     
 
 

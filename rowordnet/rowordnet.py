@@ -53,6 +53,7 @@ class RoWordNet(object):
         self._graph = nx.DiGraph()
         self._synsets = {}
         self._literal2synset = defaultdict(list)
+        self._literal2synset_strict = defaultdict(list)
         self._relation_types = set()
 
     @property
@@ -144,15 +145,14 @@ class RoWordNet(object):
                         literals_senses.append(literal[0].text if literal[0].text is not None else "")
                     synset.literals_senses = literals_senses
 
-                    for literal in synset.literals:
-                        literal_parts = literal.split('_')
-                        if len(literal_parts) > 1:
-                            for literal_part in literal_parts:
-                                if literal_part not in synset.literals:
-                                    synset.add_literal(literal_part)
-
+                    # index literals
                     for literal in synset.literals:
                         self._literal2synset[literal].append(synset.id)
+                        self._literal2synset_strict[literal].append(synset.id)
+                        literal_parts = literal.split('_')
+                        if len(literal_parts) > 1:  # add composing words for multi-word literals in non-strict index
+                            for literal_part in literal_parts:
+                                self._literal2synset[literal_part].append(synset.id)
 
                 if element.tag == 'STAMP':
                     synset.stamp = element.text
@@ -207,7 +207,12 @@ class RoWordNet(object):
         for synset_id in synsets_id:
             synset = wn.synset(synset_id)
             for literal in synset.literals:
-                self._literal2synset[literal].append(synset_id)
+                self._literal2synset[literal].append(synset.id)
+                self._literal2synset_strict[literal].append(synset.id)
+                literal_parts = literal.split('_')
+                if len(literal_parts) > 1:  # add composing words for multi-word literals in non-strict index
+                    for literal_part in literal_parts:
+                        self._literal2synset[literal_part].append(synset.id)
 
     def _save_to_xml(self, filename: str):
         root = et.Element("ROWN")
@@ -259,13 +264,16 @@ class RoWordNet(object):
         with open(filename, "wb") as f:
             pickle.dump(self, f)
 
-    def synsets(self, literal: str = None, pos: Synset.Pos = None):
+    def synsets(self, literal: str = None, pos: Synset.Pos = None, strict: bool = False):
         """
             Get a list of synsets. If a literal is given, only the synsets that contain that literal will be selected.
             If a pos is given, only the synsets that have that pos will be selected.
+            Example: searching for "tren", if strict is False, return "tren_de_aterizare"; if strict is True, skip the
+            multi-word expression literal and return exact matches (i.e. only "tren").
             Args:
                 literal (str, optional): The literal that synsets must contain. Defaults to None.
                 pos (Synset.Pos, optional): The type of pos that synsets must have. Defaults to None.
+                strict (bool, optional): Retrieve exact results. Defaults to False.
             Returns:
                 list of Synsets: A list containing the desired synsets. If no synset with the given word is found, it
                 will return an empty list.
@@ -280,10 +288,14 @@ class RoWordNet(object):
                 raise TypeError("Argument 'literal' has incorrect type, expected str, got {}"
                                 .format(type(literal).__name__))
 
-            if literal not in self._literal2synset:
-                return []
-
-            synsets_id = self._literal2synset[literal]
+            if strict:
+                if literal not in self._literal2synset_strict:
+                    return []
+                synsets_id = self._literal2synset_strict[literal]
+            else:
+                if literal not in self._literal2synset:
+                    return []
+                synsets_id = self._literal2synset[literal]
 
         if pos is not None:
             if not isinstance(pos, Synset.Pos):
@@ -360,9 +372,15 @@ class RoWordNet(object):
         """
 
         self._literal2synset.clear()
+        self._literal2synset_strict.clear()
         for synset in self._synsets.values():
             for literal in synset.literals:
                 self._literal2synset[literal].append(synset.id)
+                [literal].append(synset.id)
+                literal_parts = literal.split('_')
+                if len(literal_parts) > 1:  # add composing words for multi-word literals in non-strict index
+                    for literal_part in literal_parts:
+                        self._literal2synset[literal_part].append(synset.id)
 
     def inbound_relations(self, synset_id: str):
         if not isinstance(synset_id, str):
@@ -520,6 +538,11 @@ class RoWordNet(object):
         self._synsets[synset.id] = synset
         for literal in synset.literals:
             self._literal2synset[literal].append(synset.id)
+            self._literal2synset_strict[literal].append(synset.id)
+            literal_parts = literal.split('_')
+            if len(literal_parts) > 1:  # add composing words for multi-word literals in non-strict index
+                for literal_part in literal_parts:
+                    self._literal2synset[literal_part].append(synset.id)
 
     def add_relation(self, synset_id1: str, synset_id2: str, relation: str):
         """
