@@ -836,10 +836,13 @@ class RoWordNet(object):
         if synset_id2 not in self._synsets:
             raise WordNetError("Synset with id '{}' is not in the wordnet".format(synset_id2))
 
+        lcs_synset = self.lowest_hypernym_common_ancestor(synset_id1, synset_id2)
+        if lcs_synset is None:
+            return -1
+
         depth_synset1 = len(self.synset_to_hypernym_root(synset_id1))
         depth_synset2 = len(self.synset_to_hypernym_root(synset_id2))
 
-        lcs_synset = self.lowest_hypernym_common_ancestor(synset_id1, synset_id2)
         depth_lcs_synset = len(self.synset_to_hypernym_root(lcs_synset))
 
         return 2 * depth_lcs_synset / (depth_synset1 + depth_synset2)
