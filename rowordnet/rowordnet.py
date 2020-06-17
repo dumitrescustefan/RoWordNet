@@ -838,7 +838,7 @@ class RoWordNet(object):
 
         lcs_synset = self.lowest_hypernym_common_ancestor(synset_id1, synset_id2)
         if lcs_synset is None:
-            return -1
+            return None
 
         depth_synset1 = len(self.synset_to_hypernym_root(synset_id1))
         depth_synset2 = len(self.synset_to_hypernym_root(synset_id2))
