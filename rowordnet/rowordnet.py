@@ -810,12 +810,13 @@ class RoWordNet(object):
 
         return 1 / (shortest_path_distance + 1)
 
-    def wup_similarity(self, synset_id1: str, synset_id2: str):
+    def wup_similarity(self, synset_id1: str, synset_id2: str, simulate_root: bool = True):
         """
            Returns the Wu and Palmer similarity between two synsets.
            Args:
                synset_id1 (str): Id of the first synset.
                synset_id2 (str): Id of the second synset.
+               simulate_root (bool): Simulate a virtual root if there is no common root for the two synsets.
            Returns:
                float: None if there is no path between the synsets or distance between synsets defined as
                       2 * depth(least_common_subsumer(synset1,synset2))) / (depth(synset1) + depth(synset2)) otherwise.
@@ -836,14 +837,23 @@ class RoWordNet(object):
         if synset_id2 not in self._synsets:
             raise WordNetError("Synset with id '{}' is not in the wordnet".format(synset_id2))
 
-        lcs_synset = self.lowest_hypernym_common_ancestor(synset_id1, synset_id2)
-        if lcs_synset is None:
+        if synset_id1[-1] != synset_id2[-1]:
             return None
+
+        lcs_synset = self.lowest_hypernym_common_ancestor(synset_id1, synset_id2)
 
         depth_synset1 = len(self.synset_to_hypernym_root(synset_id1))
         depth_synset2 = len(self.synset_to_hypernym_root(synset_id2))
 
-        depth_lcs_synset = len(self.synset_to_hypernym_root(lcs_synset))
+        if lcs_synset is None:
+            if simulate_root:
+                depth_synset1 += 1
+                depth_synset2 += 1
+                depth_lcs_synset = 1
+            else:
+                return None
+        else:
+            depth_lcs_synset = len(self.synset_to_hypernym_root(lcs_synset))
 
         return 2 * depth_lcs_synset / (depth_synset1 + depth_synset2)
 
