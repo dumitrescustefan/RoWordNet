@@ -719,6 +719,7 @@ class RoWordNet(object):
                 TypeError: If any argument has incorrect type.
                 WordNerError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
                     value.
+                networkx.exception.NetworkXNoPath: If there is no path between the synsets.
         """
 
         if not isinstance(synset_id1, str):
@@ -763,6 +764,9 @@ class RoWordNet(object):
 
                         if adj_synset_id == synset_id2:
                             found = True
+
+            if not found:
+                raise nx.exception.NetworkXNoPath()
 
             shortest_path_list = [synset_id2]
             cur_synset_id = synset_id2
