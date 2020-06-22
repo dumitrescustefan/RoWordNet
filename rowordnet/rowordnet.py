@@ -628,6 +628,9 @@ class RoWordNet(object):
         synset_id_ancestor = synset_id
         synset_id_to_root = [synset_id]
 
+        if len(self.relations(synset_id)) == 0:
+            return synset_id_to_root
+
         while synset_id_ancestor is not None:
             adj_synsets_id = self._graph[synset_id_ancestor]
 
