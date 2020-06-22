@@ -628,6 +628,9 @@ class RoWordNet(object):
         synset_id_ancestor = synset_id
         synset_id_to_root = [synset_id]
 
+        if len(self.relations(synset_id)) == 0:
+            return synset_id_to_root
+
         while synset_id_ancestor is not None:
             adj_synsets_id = self._graph[synset_id_ancestor]
 
@@ -778,12 +781,13 @@ class RoWordNet(object):
             shortest_path_list.reverse()
             return shortest_path_list
 
-    def path_similarity(self, synset_id1: str, synset_id2: str):
+    def path_similarity(self, synset_id1: str, synset_id2: str, simulate_root:bool = True):
         """
             Returns the path similarity between two synsets.
             Args:
                 synset_id1 (str): Id of the first synset.
                 synset_id2 (str): Id of the second synset.
+                simulate_root (bool): Simulate a virtual root if there is no common root for the two synsets.
             Returns:
                 float: 1 if the synsets are equal, None if there is no path between the synsets or
                        1 / 1/(shortest_path_distance + 1) otherwise.
@@ -810,7 +814,13 @@ class RoWordNet(object):
         try:
             shortest_path_distance = len(self.shortest_path(synset_id1, synset_id2, relations={"hypernym", "hyponym"}))
         except nx.exception.NetworkXNoPath:
-            return None
+            if simulate_root:
+                depth_synset1 = len(self.synset_to_hypernym_root(synset_id1))
+                depth_synset2 = len(self.synset_to_hypernym_root(synset_id2))
+
+                shortest_path_distance = depth_synset1 + depth_synset2 + 2
+            else:
+                return None
 
         return 1 / (shortest_path_distance + 1)
 
