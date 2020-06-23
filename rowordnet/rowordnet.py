@@ -33,8 +33,6 @@ class RoWordNet(object):
         if not isinstance(xml, bool):
             raise TypeError("Argument 'xml' has incorrect type, expected bool, got {}".format(type(xml).__name__))
 
-        self._max_hypernym_height = self._hypernym_tree_height("ENG30-00002684-n")
-
         self._clean()
         if empty:
             return
@@ -50,6 +48,8 @@ class RoWordNet(object):
             self._load_from_xml(filename)
         elif xml is False:
             self._load_from_binary(filename)
+
+        self._max_hypernym_height = self._hypernym_tree_height("ENG30-00002684-n")
 
     def _clean(self):
         self._graph = nx.DiGraph()
