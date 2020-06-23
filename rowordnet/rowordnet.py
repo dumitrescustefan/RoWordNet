@@ -42,12 +42,11 @@ class RoWordNet(object):
             path = "rowordnet.pickle"  # always use slash
             filepath = pkg_resources.resource_filename(__name__, path)
             self._load_from_binary(filepath)
-            return
-
-        if xml is True:
-            self._load_from_xml(filename)
-        elif xml is False:
-            self._load_from_binary(filename)
+        else:
+            if xml is True:
+                self._load_from_xml(filename)
+            else:
+                self._load_from_binary(filename)
 
         self._max_hypernym_height = self._hypernym_tree_height("ENG30-00002684-n")
 
