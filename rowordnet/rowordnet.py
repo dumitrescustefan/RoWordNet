@@ -33,6 +33,8 @@ class RoWordNet(object):
         if not isinstance(xml, bool):
             raise TypeError("Argument 'xml' has incorrect type, expected bool, got {}".format(type(xml).__name__))
 
+        self._max_hypernym_height = self._hypernym_tree_height("ENG30-00002684-n")
+
         self._clean()
         if empty:
             return
@@ -883,12 +885,13 @@ class RoWordNet(object):
 
         return max(depths) + 1
 
-    def lch_similarity(self, synset_id1: str, synset_id2: str):
+    def lch_similarity(self, synset_id1: str, synset_id2: str, simulate_root: bool = True):
         """
             Returns the Leacock and Chodorow similarity between two synsets.
             Args:
                 synset_id1 (str): Id of the first synset.
                 synset_id2 (str): Id of the second synset.
+                simulate_root (bool): Simulate a virtual root if there is no common root for the two synsets.
             Returns:
                 float: None if there is no path between the synsets or distance between synsets defined as
                        -log ((dist(synset1,synset2)+1) / (2 * maximum taxonomy depth)) otherwise.
@@ -909,15 +912,22 @@ class RoWordNet(object):
         if synset_id2 not in self._synsets:
             raise WordNetError("Synset with id '{}' is not in the wordnet".format(synset_id2))
 
+        max_hypernym_height = self._max_hypernym_height
+
         try:
             shortest_path_distance = len(self.shortest_path(synset_id1, synset_id2, relations={"hypernym", "hyponym"}))
         except nx.exception.NetworkXNoPath:
-            return None
+            if simulate_root:
+                depth_synset1 = len(self.synset_to_hypernym_root(synset_id1))
+                depth_synset2 = len(self.synset_to_hypernym_root(synset_id2))
 
-        root_id = "ENG30-00002684-n"
-        max_hypernym_depth = self._hypernym_tree_height(root_id)
+                shortest_path_distance = depth_synset1 + depth_synset2 + 2
 
-        return - math.log2((shortest_path_distance + 1) / (2 * max_hypernym_depth))
+                max_hypernym_height += 1
+            else:
+                return None
+
+        return - math.log2((shortest_path_distance + 1) / (2 * max_hypernym_height))
 
 
 def intersection(wordnet_1, wordnet_2):
