@@ -52,6 +52,7 @@ class RoWordNet(object):
 
     def _clean(self):
         self._graph = nx.DiGraph()
+        self._hypernym_graph = nx.DiGraph()
         self._synsets = {}
         self._literal2synset = defaultdict(list)
         self._literal2synset_strict = defaultdict(list)
@@ -201,6 +202,11 @@ class RoWordNet(object):
             adj_synsets_id = wn.outbound_relations(synset_id)
             for adj_synset_id, relation in adj_synsets_id:
                 self._graph.add_edge(synset_id, adj_synset_id, label=relation)
+
+                if relation == "hypernym" or relation == "hyponym":
+                    self._hypernym_graph.add_edge(synset_id, adj_synset_id, label=relation)
+                else:
+                    self._hypernym_graph.add_node(synset_id)
 
         for synset_id in synsets_id:
             self._synsets[synset_id] = wn.synset(synset_id)
@@ -626,24 +632,23 @@ class RoWordNet(object):
         if synset_id not in self._synsets:
             raise WordNetError("Synset with id '{}' is not in the wordnet".format(synset_id))
 
-        synset_id_ancestor = synset_id
-        synset_id_to_root = [synset_id]
+        # synset_id_ancestor = synset_id
+        # synset_id_to_root = [synset_id]
+        #
+        # if len(self.relations(synset_id)) == 0:
+        #     return synset_id_to_root
+        #
+        # while synset_id_ancestor is not None:
+        #     adj_synsets_id = self._graph[synset_id_ancestor]
+        #     synset_id_ancestor = None
+        #
+        #     for adj_synset_id, adj_synset_data in adj_synsets_id.items():
+        #         if adj_synset_data['label'] == 'hypernym':
+        #             synset_id_to_root.append(adj_synset_id)
+        #             synset_id_ancestor = adj_synset_id
+        #             break
 
-        if len(self.relations(synset_id)) == 0:
-            return synset_id_to_root
-
-        while synset_id_ancestor is not None:
-            adj_synsets_id = self._graph[synset_id_ancestor]
-
-            synset_id_ancestor = None
-
-            for adj_synset_id, adj_synset_data in adj_synsets_id.items():
-                if adj_synset_data['label'] == 'hypernym':
-                    synset_id_to_root.append(adj_synset_id)
-                    synset_id_ancestor = adj_synset_id
-                    break
-
-        return synset_id_to_root
+        return nx.algorithms.traversal.depth_first_search.dfs_predecessors(self._hypernym_graph, synset_id)
 
     def lowest_hypernym_common_ancestor(self, synset_id1: str, synset_id2: str):
         """
@@ -658,14 +663,16 @@ class RoWordNet(object):
                 WordNerError: If there's no synset with the given ids in the wordnet.value.
         """
 
-        synset_id1_to_root = self.synset_to_hypernym_root(synset_id1)
-        synset_id2_to_root = self.synset_to_hypernym_root(synset_id2)
+        return nx.algorithms.lowest_common_ancestors.lowest_common_ancestor(self._hypernym_graph, synset_id1, synset_id2)
 
-        for synset_1 in synset_id1_to_root:
-            for synset_2 in synset_id2_to_root:
-                if synset_1 == synset_2:
-                    lowest_common_ancestor = synset_1
-                    return lowest_common_ancestor
+        # synset_id1_to_root = self.synset_to_hypernym_root(synset_id1)
+        # synset_id2_to_root = self.synset_to_hypernym_root(synset_id2)
+        # 
+        # for synset_1 in synset_id1_to_root:
+        #     for synset_2 in synset_id2_to_root:
+        #         if synset_1 == synset_2:
+        #             lowest_common_ancestor = synset_1
+        #             return lowest_common_ancestor
 
     def bfwalk(self, synset_id: str):
         """
@@ -751,38 +758,12 @@ class RoWordNet(object):
                 if relation not in self._relation_types:
                     raise WordNetError("Relation '{}' is not a correct relation".format(relation))
 
-            queue = Queue()
-            queue.put(synset_id1)
-            from_synset_id = {}
-            marked_synset_ids = [synset_id1]
-            found = False
+            if relations == {"hypernym", "hyponym"}:
+                return nx.shortest_path(self._hypernym_graph, synset_id1, synset_id2)
+            else:
+                raise NotImplemented("The current set of relations is not supported anymore by the function.")
 
-            while not queue.empty() and not found:
-                cur_synset_id = queue.get()
-
-                for adj_synset_id, data in self._graph.adj[cur_synset_id].items():
-                    if data['label'] in relations and adj_synset_id not in marked_synset_ids:
-                        from_synset_id[adj_synset_id] = cur_synset_id
-                        queue.put(adj_synset_id)
-                        marked_synset_ids.append(adj_synset_id)
-
-                        if adj_synset_id == synset_id2:
-                            found = True
-
-            if not found:
-                raise nx.exception.NetworkXNoPath()
-
-            shortest_path_list = [synset_id2]
-            cur_synset_id = synset_id2
-
-            while not cur_synset_id == synset_id1:
-                cur_synset_id = from_synset_id[cur_synset_id]
-                shortest_path_list.append(cur_synset_id)
-
-            shortest_path_list.reverse()
-            return shortest_path_list
-
-    def path_similarity(self, synset_id1: str, synset_id2: str, simulate_root:bool = True):
+    def path_similarity(self, synset_id1: str, synset_id2: str, simulate_root: bool = True):
         """
             Returns the path similarity between two synsets.
             Args:
