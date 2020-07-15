@@ -322,7 +322,7 @@ class RoWordNet(object):
 
             Raises:
                 TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given id in the wordnet.
+                WordNetError: If there's no synset with the given id in the wordnet.
         """
 
         if not isinstance(synset_id, str):
@@ -561,7 +561,7 @@ class RoWordNet(object):
                 relation(str): Relation type between the synsets.
             Raises:
                 TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given ids in the wordnet, if there's already a relation from
+                WordNetError: If there's no synset with the given ids in the wordnet, if there's already a relation from
                     the first synset to the second synset or if the given relation has an incorrect value.
         """
 
@@ -594,7 +594,7 @@ class RoWordNet(object):
                 synset_id2 (str): Id of the second synset.
             Raises:
                 TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given ids in the wordnet or if there's no relation from the
+                WordNetError: If there's no synset with the given ids in the wordnet or if there's no relation from the
                     first synset to the second synset.
         """
 
@@ -623,7 +623,7 @@ class RoWordNet(object):
                 list: A list containing synset ids that create the path to the root of the tree.
             Raises:
                 TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given id in the wordnet.
+                WordNetError: If there's no synset with the given id in the wordnet.
         """
 
         if not isinstance(synset_id, str):
@@ -657,7 +657,7 @@ class RoWordNet(object):
                 str: A synset ID representing the lowest common ancestor in the specified tree.
             Raises:
                 TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given ids in the wordnet.value.
+                WordNetError: If there's no synset with the given ids in the wordnet.value.
         """
 
         synset_id1_to_root = self.synset_to_hypernym_root(synset_id1)
@@ -678,7 +678,7 @@ class RoWordNet(object):
                 Synset: The next synset in the wordnet.
             Raises:
                 TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given id in the wordnet.
+                WordNetError: If there's no synset with the given id in the wordnet.
         """
 
         if not isinstance(synset_id, str):
@@ -723,7 +723,7 @@ class RoWordNet(object):
                 the first synset to the second synset.
             Raises:
                 TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
+                WordNetError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
                     value.
                 networkx.exception.NetworkXNoPath: If there is no path between the synsets.
         """
@@ -770,7 +770,7 @@ class RoWordNet(object):
                        1 / 1/(shortest_path_distance + 1) otherwise.
             Raises:
                 TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
+                WordNetError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
                     value.
         """
         if not isinstance(synset_id1, str):
@@ -813,7 +813,7 @@ class RoWordNet(object):
                       2 * depth(least_common_subsumer(synset1,synset2))) / (depth(synset1) + depth(synset2)) otherwise.
            Raises:
                TypeError: If any argument has incorrect type.
-               WordNerError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
+               WordNetError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
                    value.
         """
         if not isinstance(synset_id1, str):
@@ -872,7 +872,7 @@ class RoWordNet(object):
                        -log ((dist(synset1,synset2)+1) / (2 * maximum taxonomy depth)) otherwise.
             Raises:
                 TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
+                WordNetError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
                     value.
         """
         if not isinstance(synset_id1, str):
