@@ -632,23 +632,20 @@ class RoWordNet(object):
         if synset_id not in self._synsets:
             raise WordNetError("Synset with id '{}' is not in the wordnet".format(synset_id))
 
-        # synset_id_ancestor = synset_id
-        # synset_id_to_root = [synset_id]
-        #
-        # if len(self.relations(synset_id)) == 0:
-        #     return synset_id_to_root
-        #
-        # while synset_id_ancestor is not None:
-        #     adj_synsets_id = self._graph[synset_id_ancestor]
-        #     synset_id_ancestor = None
-        #
-        #     for adj_synset_id, adj_synset_data in adj_synsets_id.items():
-        #         if adj_synset_data['label'] == 'hypernym':
-        #             synset_id_to_root.append(adj_synset_id)
-        #             synset_id_ancestor = adj_synset_id
-        #             break
+        synset_id_ancestor = synset_id
+        synset_id_to_root = [synset_id]
 
-        return nx.algorithms.traversal.depth_first_search.dfs_predecessors(self._hypernym_graph, synset_id)
+        while synset_id_ancestor is not None:
+            adj_synsets = self._hypernym_graph[synset_id_ancestor]
+            synset_id_ancestor = None
+
+            for adj_synset_id, adj_synset_data in adj_synsets.items():
+                if adj_synset_data['label'] == 'hypernym':
+                    synset_id_to_root.append(adj_synset_id)
+                    synset_id_ancestor = adj_synset_id
+                    break
+
+        return synset_id_to_root
 
     def lowest_hypernym_common_ancestor(self, synset_id1: str, synset_id2: str):
         """
@@ -663,16 +660,14 @@ class RoWordNet(object):
                 WordNerError: If there's no synset with the given ids in the wordnet.value.
         """
 
-        return nx.algorithms.lowest_common_ancestors.lowest_common_ancestor(self._hypernym_graph, synset_id1, synset_id2)
+        synset_id1_to_root = self.synset_to_hypernym_root(synset_id1)
+        synset_id2_to_root = self.synset_to_hypernym_root(synset_id2)
 
-        # synset_id1_to_root = self.synset_to_hypernym_root(synset_id1)
-        # synset_id2_to_root = self.synset_to_hypernym_root(synset_id2)
-        # 
-        # for synset_1 in synset_id1_to_root:
-        #     for synset_2 in synset_id2_to_root:
-        #         if synset_1 == synset_2:
-        #             lowest_common_ancestor = synset_1
-        #             return lowest_common_ancestor
+        for synset_1 in synset_id1_to_root:
+            for synset_2 in synset_id2_to_root:
+                if synset_1 == synset_2:
+                    lowest_common_ancestor = synset_1
+                    return lowest_common_ancestor
 
     def bfwalk(self, synset_id: str):
         """
