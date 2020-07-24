@@ -199,14 +199,15 @@ class RoWordNet(object):
         synsets_id = wn.synsets()
 
         for synset_id in synsets_id:
+            self._graph.add_node(synset_id)
+            self._hypernym_graph.add_node(synset_id)
+
             adj_synsets_id = wn.outbound_relations(synset_id)
             for adj_synset_id, relation in adj_synsets_id:
                 self._graph.add_edge(synset_id, adj_synset_id, label=relation)
 
                 if relation == "hypernym" or relation == "hyponym":
                     self._hypernym_graph.add_edge(synset_id, adj_synset_id, label=relation)
-                else:
-                    self._hypernym_graph.add_node(synset_id)
 
         for synset_id in synsets_id:
             self._synsets[synset_id] = wn.synset(synset_id)
