@@ -52,6 +52,7 @@ class RoWordNet(object):
 
     def _clean(self):
         self._graph = nx.DiGraph()
+        self._hypernym_graph = nx.DiGraph()
         self._synsets = {}
         self._literal2synset = defaultdict(list)
         self._literal2synset_strict = defaultdict(list)
@@ -198,9 +199,15 @@ class RoWordNet(object):
         synsets_id = wn.synsets()
 
         for synset_id in synsets_id:
+            self._graph.add_node(synset_id)
+            self._hypernym_graph.add_node(synset_id)
+
             adj_synsets_id = wn.outbound_relations(synset_id)
             for adj_synset_id, relation in adj_synsets_id:
                 self._graph.add_edge(synset_id, adj_synset_id, label=relation)
+
+                if relation == "hypernym" or relation == "hyponym":
+                    self._hypernym_graph.add_edge(synset_id, adj_synset_id, label=relation)
 
         for synset_id in synsets_id:
             self._synsets[synset_id] = wn.synset(synset_id)
@@ -316,7 +323,7 @@ class RoWordNet(object):
 
             Raises:
                 TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given id in the wordnet.
+                WordNetError: If there's no synset with the given id in the wordnet.
         """
 
         if not isinstance(synset_id, str):
@@ -555,7 +562,7 @@ class RoWordNet(object):
                 relation(str): Relation type between the synsets.
             Raises:
                 TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given ids in the wordnet, if there's already a relation from
+                WordNetError: If there's no synset with the given ids in the wordnet, if there's already a relation from
                     the first synset to the second synset or if the given relation has an incorrect value.
         """
 
@@ -588,7 +595,7 @@ class RoWordNet(object):
                 synset_id2 (str): Id of the second synset.
             Raises:
                 TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given ids in the wordnet or if there's no relation from the
+                WordNetError: If there's no synset with the given ids in the wordnet or if there's no relation from the
                     first synset to the second synset.
         """
 
@@ -617,7 +624,7 @@ class RoWordNet(object):
                 list: A list containing synset ids that create the path to the root of the tree.
             Raises:
                 TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given id in the wordnet.
+                WordNetError: If there's no synset with the given id in the wordnet.
         """
 
         if not isinstance(synset_id, str):
@@ -629,15 +636,11 @@ class RoWordNet(object):
         synset_id_ancestor = synset_id
         synset_id_to_root = [synset_id]
 
-        if len(self.relations(synset_id)) == 0:
-            return synset_id_to_root
-
         while synset_id_ancestor is not None:
-            adj_synsets_id = self._graph[synset_id_ancestor]
-
+            adj_synsets = self._hypernym_graph[synset_id_ancestor]
             synset_id_ancestor = None
 
-            for adj_synset_id, adj_synset_data in adj_synsets_id.items():
+            for adj_synset_id, adj_synset_data in adj_synsets.items():
                 if adj_synset_data['label'] == 'hypernym':
                     synset_id_to_root.append(adj_synset_id)
                     synset_id_ancestor = adj_synset_id
@@ -655,7 +658,7 @@ class RoWordNet(object):
                 str: A synset ID representing the lowest common ancestor in the specified tree.
             Raises:
                 TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given ids in the wordnet.value.
+                WordNetError: If there's no synset with the given ids in the wordnet.value.
         """
 
         synset_id1_to_root = self.synset_to_hypernym_root(synset_id1)
@@ -676,7 +679,7 @@ class RoWordNet(object):
                 Synset: The next synset in the wordnet.
             Raises:
                 TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given id in the wordnet.
+                WordNetError: If there's no synset with the given id in the wordnet.
         """
 
         if not isinstance(synset_id, str):
@@ -721,7 +724,7 @@ class RoWordNet(object):
                 the first synset to the second synset.
             Raises:
                 TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
+                WordNetError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
                     value.
                 networkx.exception.NetworkXNoPath: If there is no path between the synsets.
         """
@@ -751,38 +754,12 @@ class RoWordNet(object):
                 if relation not in self._relation_types:
                     raise WordNetError("Relation '{}' is not a correct relation".format(relation))
 
-            queue = Queue()
-            queue.put(synset_id1)
-            from_synset_id = {}
-            marked_synset_ids = [synset_id1]
-            found = False
+            if relations == {"hypernym", "hyponym"}:
+                return nx.shortest_path(self._hypernym_graph, synset_id1, synset_id2)
+            else:
+                raise NotImplemented("The current set of relations is not supported anymore by the function.")
 
-            while not queue.empty() and not found:
-                cur_synset_id = queue.get()
-
-                for adj_synset_id, data in self._graph.adj[cur_synset_id].items():
-                    if data['label'] in relations and adj_synset_id not in marked_synset_ids:
-                        from_synset_id[adj_synset_id] = cur_synset_id
-                        queue.put(adj_synset_id)
-                        marked_synset_ids.append(adj_synset_id)
-
-                        if adj_synset_id == synset_id2:
-                            found = True
-
-            if not found:
-                raise nx.exception.NetworkXNoPath()
-
-            shortest_path_list = [synset_id2]
-            cur_synset_id = synset_id2
-
-            while not cur_synset_id == synset_id1:
-                cur_synset_id = from_synset_id[cur_synset_id]
-                shortest_path_list.append(cur_synset_id)
-
-            shortest_path_list.reverse()
-            return shortest_path_list
-
-    def path_similarity(self, synset_id1: str, synset_id2: str, simulate_root:bool = True):
+    def path_similarity(self, synset_id1: str, synset_id2: str, simulate_root: bool = True):
         """
             Returns the path similarity between two synsets.
             Args:
@@ -794,7 +771,7 @@ class RoWordNet(object):
                        1 / 1/(shortest_path_distance + 1) otherwise.
             Raises:
                 TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
+                WordNetError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
                     value.
         """
         if not isinstance(synset_id1, str):
@@ -837,7 +814,7 @@ class RoWordNet(object):
                       2 * depth(least_common_subsumer(synset1,synset2))) / (depth(synset1) + depth(synset2)) otherwise.
            Raises:
                TypeError: If any argument has incorrect type.
-               WordNerError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
+               WordNetError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
                    value.
         """
         if not isinstance(synset_id1, str):
@@ -896,7 +873,7 @@ class RoWordNet(object):
                        -log ((dist(synset1,synset2)+1) / (2 * maximum taxonomy depth)) otherwise.
             Raises:
                 TypeError: If any argument has incorrect type.
-                WordNerError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
+                WordNetError: If there's no synset with the given ids in the wordnet or if any relation has an incorrect
                     value.
         """
         if not isinstance(synset_id1, str):
