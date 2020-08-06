@@ -1,11 +1,16 @@
 [![Build Status](https://travis-ci.org/dumitrescustefan/RoWordNet.svg?branch=master)](https://travis-ci.org/dumitrescustefan/RoWordNet)
 [![Python 3](https://img.shields.io/badge/python-3-blue.svg)](https://www.python.org/downloads/)
-[![Version 1.0](https://img.shields.io/badge/version-1.0-red.svg)]()
+[![Version 1.1](https://img.shields.io/badge/version-1.1-red.svg)]()
 
 # RoWordNet
 
 **RoWordNet stand for Romanian WordNet, a semantic network for the Romanian language**. RoWordNet mimics Princeton WordNet, a large lexical database of English. 
 The building block of a WordNet is the **synset** that expresses a unique concept. The synset (a synonym set) contains, as the name implies, a number of synonym words known as literals. The synset has more properties like a definition and links to other synsets. They also have a part-of-speech (pos) that groups them in four categories: nouns, verbs, adverbs and adjectives. Synsets are interlinked by **semantic relations** like hypernymy ("is-a"), meronymy ("is-part"), antonymy, and others. 
+
+#### New version release : 1.1
+
+* Fixed a bug that when searching the results would give back synsets that contained incorrectly split multi-word literals. We have now added the ``strict = True`` option to obtain only entire word (or multi-word) literals. (Issue [#23](https://github.com/dumitrescustefan/RoWordNet/issues/23))
+* Optimized the three similarity algorithms: ``path``, ``wup`` and ``lch``. Similarity is now significantly faster by orders of magnitute by separately computing a hypernym tree and running sim over it instead of the entire word net. (Issue [#27](https://github.com/dumitrescustefan/RoWordNet/issues/27))
 
 ## Install
 
